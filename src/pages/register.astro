@@ -1,0 +1,38 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TopNavBar from '../components/TopNavBar.astro';
+import MobileDock from '../components/MobileDock.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import RegistrationForm from '../components/RegistrationForm.astro';
+import RegistrationSidebar from '../components/RegistrationSidebar.astro';
+import { registration, site } from '../data/site';
+---
+
+<BaseLayout
+  description={registration.subtitle}
+  title={`ثبت کسب و کار | ${site.nameFa}`}
+>
+  <TopNavBar />
+
+  <main class="flex-grow w-full max-w-screen-2xl mx-auto px-margin-mobile md:px-margin-desktop py-xl pb-28 md:pb-xl">
+    <!-- Hero -->
+    <section class="text-center mb-xl">
+      <h1 class="font-headline-xl text-headline-xl text-on-surface mb-base">
+        {registration.title}
+      </h1>
+      <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">
+        {registration.subtitle}
+      </p>
+    </section>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-lg items-start">
+      <div class="lg:col-span-8">
+        <RegistrationForm />
+      </div>
+      <RegistrationSidebar />
+    </div>
+  </main>
+
+  <MobileDock />
+  <SiteFooter />
+</BaseLayout>

@@ -1,0 +1,74 @@
+---
+import { registration } from '../data/site';
+---
+
+<aside class="lg:col-span-4 space-y-md">
+  <!-- Trust Section -->
+  <div class="bg-surface-container rounded-3xl border border-outline-variant p-md">
+    <h3 class="font-headline-md text-headline-md text-on-surface mb-sm flex items-center gap-2">
+      <span class="material-symbols-outlined text-primary">verified</span>
+      {registration.trust.title}
+    </h3>
+    <ul class="space-y-sm mt-md">
+      {
+        registration.trust.items.map((item) => (
+          <li class="flex items-start gap-3">
+            <span class:list={['material-symbols-outlined mt-1', item.tone]}>{item.icon}</span>
+            <div>
+              <h4 class="font-label-md text-label-md text-on-surface">{item.title}</h4>
+              <p class="font-body-md text-body-md text-on-surface-variant text-sm mt-1">
+                {item.body}
+              </p>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <!-- Plans Comparison -->
+  <div class="bg-surface-container rounded-3xl border border-outline-variant p-md overflow-hidden relative">
+    <div class="absolute -top-10 -right-10 w-32 h-32 bg-primary/10 rounded-full blur-2xl pointer-events-none"></div>
+    <h3 class="font-headline-md text-headline-md text-on-surface mb-md relative">
+      {registration.plansTitle}
+    </h3>
+    <div class="space-y-sm relative">
+      {
+        registration.plans.map((plan) => (
+          <div
+            class:list={[
+              'p-3 rounded-xl border',
+              plan.featured
+                ? 'border-primary bg-surface/50 relative'
+                : 'border-outline-variant bg-surface-dim',
+            ]}
+          >
+            {plan.featured && (
+              <span class="absolute -top-2 left-4 bg-primary text-on-primary text-[10px] px-2 py-0.5 rounded font-bold">
+                پیشنهادی
+              </span>
+            )}
+            <div class="flex justify-between items-center mb-2 gap-2">
+              <span
+                class:list={[
+                  'font-label-md text-label-md font-bold',
+                  plan.featured ? 'text-primary' : 'text-on-surface',
+                ]}
+              >
+                {plan.name}
+              </span>
+              {plan.badge && (
+                <span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-variant px-2 py-1 rounded">
+                  {plan.badge}
+                </span>
+              )}
+            </div>
+            <ul class="font-body-md text-body-md text-sm text-on-surface-variant space-y-1">
+              {plan.features.map((feature) => <li>✓ {feature}</li>)}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</aside>

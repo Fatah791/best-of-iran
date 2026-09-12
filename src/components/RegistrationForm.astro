@@ -1,0 +1,400 @@
+---
+import Icon from './Icon.astro';
+import { registration } from '../data/site';
+import { categories, cities } from '../data/site';
+
+const { steps, basics, contact, images, location } = registration;
+const inputCls =
+  'w-full p-3 rounded-lg border border-outline-variant bg-surface-container-lowest text-on-surface font-body-md text-body-md placeholder:text-on-surface-variant/50 focus:border-primary-container focus:outline-none transition-colors';
+const labelCls = 'block font-label-md text-label-md text-on-surface-variant mb-2';
+---
+
+<div
+  class="rounded-3xl p-md md:p-lg border border-outline-variant/50 shadow-lg"
+  data-registration
+>
+  <!-- Steps Progress -->
+  <ol
+    class="flex justify-between items-center mb-lg relative before:content-[''] before:absolute before:top-4 before:right-[12%] before:left-[12%] before:h-[2px] before:bg-surface-variant"
+    id="step-indicators"
+  >
+    {
+      steps.map((step, i) => (
+        <li
+          class:list={['step flex flex-col items-center gap-2 bg-background px-2 relative']}
+          data-step={i}
+        >
+          <span
+            class="marker w-8 h-8 rounded-full flex items-center justify-center font-bold font-label-md text-label-md transition-colors"
+          >
+            {'۰۱۲۳۴'[i + 1]}
+          </span>
+          <span class="step-label font-label-sm text-label-sm text-on-surface-variant">
+            {step.label}
+          </span>
+        </li>
+      ))
+    }
+  </ol>
+
+  <form id="registration-form" novalidate>
+    <!-- ── Step 1: اطلاعات پایه ───────────────────────────────── -->
+    <fieldset class="step-panel space-y-md" data-panel="0">
+      <legend class="font-headline-md text-headline-md text-on-surface mb-md sr-only">
+        {basics.title}
+      </legend>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-sm">
+        <div>
+          <label class={labelCls} for="biz-name">نام کسب و کار *</label>
+          <input class={inputCls} id="biz-name" name="name" placeholder="مثال: رستوران مسلم" required type="text" />
+          <p class="field-error hidden text-error text-xs mt-1" data-error-for="name">
+            نام کسب و کار را وارد کنید.
+          </p>
+        </div>
+        <div>
+          <label class={labelCls} for="biz-category">دسته‌بندی اصلی *</label>
+          <select class={inputCls} id="biz-category" name="category" required>
+            <option disabled selected value="">انتخاب کنید...</option>
+            {categories.map((c) => <option value={c.slug}>{c.label}</option>)}
+          </select>
+          <p class="field-error hidden text-error text-xs mt-1" data-error-for="category">
+            یک دسته‌بندی انتخاب کنید.
+          </p>
+        </div>
+      </div>
+
+      <div>
+        <label class={labelCls} for="biz-city">شهر *</label>
+        <select class={inputCls} id="biz-city" name="city" required>
+          <option disabled selected value="">انتخاب شهر...</option>
+          {cities.map((c) => <option value={c.slug}>{c.label}</option>)}
+        </select>
+        <p class="field-error hidden text-error text-xs mt-1" data-error-for="city">
+          شهر را انتخاب کنید.
+        </p>
+      </div>
+
+      <div>
+        <label class={labelCls} for="biz-description">
+          توضیحات کوتاه (حداکثر {registration.basics.descriptionMax} کاراکتر)
+        </label>
+        <textarea
+          class:list={[inputCls, 'resize-none']}
+          data-counter-target="#desc-counter"
+          id="biz-description"
+          maxlength={registration.basics.descriptionMax}
+          name="description"
+          placeholder={basics.descriptionHint}
+          rows="4"
+        >
+</textarea>
+        <p class="text-xs text-on-surface-variant mt-1 text-left" dir="ltr" id="desc-counter">0 / 200</p>
+      </div>
+
+      <div class="flex justify-end pt-sm">
+        <button class="nav-btn bg-primary text-on-primary px-lg py-3 rounded-lg font-label-md text-label-md font-semibold hover:brightness-110 transition-colors" data-next type="button">
+          مرحله بعد
+          <Icon class="align-middle" icon="arrow_back" />
+        </button>
+      </div>
+    </fieldset>
+
+    <!-- ── Step 2: تماس و شبکه‌ها ─────────────────────────────── -->
+    <fieldset class="step-panel hidden space-y-md" data-panel="1">
+      <legend class="font-headline-md text-headline-md text-on-surface mb-md sr-only">
+        {contact.title}
+      </legend>
+      <p class="text-sm text-on-surface-variant -mt-sm mb-md">{contact.hint}</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-sm">
+        <div>
+          <label class={labelCls} for="biz-mobile">موبایل *</label>
+          <input class={inputCls} dir="ltr" id="biz-mobile" name="mobile" placeholder="09123456789" pattern="09[0-9]{9}" required type="tel" />
+          <p class="field-error hidden text-error text-xs mt-1" data-error-for="mobile">
+            شماره موبایل معتبر وارد کنید (مثال: 09123456789).
+          </p>
+        </div>
+        <div>
+          <label class={labelCls} for="biz-phone">تلفن ثابت</label>
+          <input class={inputCls} dir="ltr" id="biz-phone" name="phone" placeholder="03112345678" type="tel" />
+        </div>
+        <div>
+          <label class={labelCls} for="biz-email">ایمیل</label>
+          <input class={inputCls} dir="ltr" id="biz-email" name="email" placeholder="info@example.com" type="email" />
+          <p class="field-error hidden text-error text-xs mt-1" data-error-for="email">
+            قالب ایمیل صحیح نیست.
+          </p>
+        </div>
+        <div>
+          <label class={labelCls} for="biz-website">وب‌سایت</label>
+          <input class={inputCls} dir="ltr" id="biz-website" name="website" placeholder="https://example.com" type="url" />
+        </div>
+        <div>
+          <label class={labelCls} for="biz-instagram">اینستاگرام</label>
+          <input class={inputCls} dir="ltr" id="biz-instagram" name="instagram" placeholder="example_ir" type="text" />
+        </div>
+        <div>
+          <label class={labelCls} for="biz-whatsapp">واتس‌اپ</label>
+          <input class={inputCls} dir="ltr" id="biz-whatsapp" name="whatsapp" placeholder="989123456789" type="tel" />
+        </div>
+      </div>
+
+      <div class="flex justify-between pt-sm gap-3">
+        <button class="nav-btn bg-surface-variant text-on-surface px-lg py-3 rounded-lg font-label-md hover:bg-surface-container-high transition-colors" data-prev type="button">
+          <Icon class="align-middle" icon="arrow_forward" />
+          مرحله قبل
+        </button>
+        <button class="nav-btn bg-primary text-on-primary px-lg py-3 rounded-lg font-label-md font-semibold hover:brightness-110 transition-colors" data-next type="button">
+          مرحله بعد
+          <Icon class="align-middle" icon="arrow_back" />
+        </button>
+      </div>
+    </fieldset>
+
+    <!-- ── Step 3: تصاویر ─────────────────────────────────────── -->
+    <fieldset class="step-panel hidden space-y-md" data-panel="2">
+      <legend class="font-headline-md text-headline-md text-on-surface mb-md sr-only">
+        {images.title}
+      </legend>
+      <p class="text-sm text-on-surface-variant -mt-sm mb-md">{images.hint}</p>
+
+      <label
+        class="flex flex-col items-center justify-center gap-2 w-full p-lg border-2 border-dashed border-outline-variant rounded-2xl cursor-pointer hover:border-primary transition-colors bg-surface-container-lowest"
+        for="biz-images"
+      >
+        <Icon class="text-4xl text-primary" icon="add_photo_alternate" />
+        <span class="font-label-md text-label-md text-on-surface">انتخاب تصویر</span>
+        <span class="text-xs text-on-surface-variant">یا فایل‌ها را اینجا رها کنید</span>
+        <input accept="image/jpeg,image/png,image/webp" class="sr-only" id="biz-images" multiple name="images" type="file" />
+      </label>
+
+      <ul class="grid grid-cols-2 sm:grid-cols-3 gap-sm" id="image-previews"></ul>
+      <p class="hidden text-error text-xs" id="images-error">حداکثر ۳ تصویر — فایل‌های اضافی حذف می‌شوند.</p>
+
+      <div class="flex justify-between pt-sm gap-3">
+        <button class="nav-btn bg-surface-variant text-on-surface px-lg py-3 rounded-lg font-label-md hover:bg-surface-container-high transition-colors" data-prev type="button">
+          <Icon class="align-middle" icon="arrow_forward" />
+          مرحله قبل
+        </button>
+        <button class="nav-btn bg-primary text-on-primary px-lg py-3 rounded-lg font-label-md font-semibold hover:brightness-110 transition-colors" data-next type="button">
+          مرحله بعد
+          <Icon class="align-middle" icon="arrow_back" />
+        </button>
+      </div>
+    </fieldset>
+
+    <!-- ── Step 4: موقعیت ─────────────────────────────────────── -->
+    <fieldset class="step-panel hidden space-y-md" data-panel="3">
+      <legend class="font-headline-md text-headline-md text-on-surface mb-md sr-only">
+        {location.title}
+      </legend>
+      <p class="text-sm text-on-surface-variant -mt-sm mb-md">{location.hint}</p>
+
+      <div>
+        <label class={labelCls} for="biz-address">آدرس کامل *</label>
+        <textarea class:list={[inputCls, 'resize-none']} id="biz-address" name="address" placeholder="خیابان، کوچه، پلاک، طبقه..." required rows="3"></textarea>
+        <p class="field-error hidden text-error text-xs mt-1" data-error-for="address">
+          آدرس کامل را وارد کنید.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-sm">
+        <div>
+          <label class={labelCls} for="biz-postal">کد پستی</label>
+          <input class={inputCls} dir="ltr" id="biz-postal" name="postal" placeholder="1740000000" pattern="[0-9]{10}" type="text" />
+          <p class="field-error hidden text-error text-xs mt-1" data-error-for="postal">
+            کد پستی باید ۱۰ رقم باشد.
+          </p>
+        </div>
+        <div>
+          <label class={labelCls} for="biz-hours">ساعات کاری</label>
+          <input class={inputCls} id="biz-hours" name="hours" placeholder="مثال: ۹ صبح تا ۹ شب" type="text" />
+        </div>
+      </div>
+
+      <div class="bg-surface-container rounded-xl p-md border border-outline-variant flex items-start gap-3">
+        <Icon class="text-primary-container shrink-0" icon="workspace_premium" />
+        <p class="text-sm text-on-surface-variant">
+          پس از ثبت، تیم ارزیابی ما در اسرع وقت کسب‌وکار شما را بررسی و نتیجه را از طریق پیامک اطلاع می‌دهد. ثبت‌نام کاملاً رایگان است.
+        </p>
+      </div>
+
+      <div class="flex justify-between pt-sm gap-3">
+        <button class="nav-btn bg-surface-variant text-on-surface px-lg py-3 rounded-lg font-label-md hover:bg-surface-container-high transition-colors" data-prev type="button">
+          <Icon class="align-middle" icon="arrow_forward" />
+          مرحله قبل
+        </button>
+        <button class="nav-btn bg-primary text-on-primary px-lg py-3 rounded-lg font-label-md font-semibold hover:brightness-110 transition-colors flex items-center gap-2" type="submit">
+          <Icon icon="fact_check" />
+          ثبت نهایی درخواست
+        </button>
+      </div>
+    </fieldset>
+
+    <!-- ── Success state ──────────────────────────────────────── -->
+    <div class="hidden text-center py-xl" id="registration-success">
+      <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-secondary/15 mb-md">
+        <Icon class="text-5xl text-secondary" icon="check_circle" />
+      </div>
+      <h3 class="font-headline-md text-headline-md text-on-surface mb-2">درخواست شما ثبت شد!</h3>
+      <p class="text-on-surface-variant max-w-md mx-auto">
+        کسب‌وکار <strong class="text-on-surface" id="success-name"></strong> در صف بررسی قرار گرفت.
+        نتیجه را از طریق پیامک به شما اطلاع می‌دهیم.
+      </p>
+      <a class="inline-block mt-lg text-primary font-label-md border-b border-primary pb-1 hover:text-primary-fixed transition-colors" href="/">
+        بازگشت به صفحه اصلی
+      </a>
+    </div>
+  </form>
+</div>
+
+<style>
+  .step.is-active .marker {
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+  }
+  .step.is-active .step-label {
+    color: var(--color-primary);
+  }
+  .step.is-done .marker {
+    background-color: var(--color-secondary-container);
+    color: var(--color-on-secondary-container);
+  }
+  input[aria-invalid='true'],
+  select[aria-invalid='true'],
+  textarea[aria-invalid='true'] {
+    border-color: var(--color-error);
+  }
+</style>
+
+<script>
+  /**
+   * Multi-step registration form:
+   * - client-side step navigation with per-step validation
+   * - live character counter + image preview
+   * - submits as JSON to /api/register (add the endpoint or an API
+   *   integration later); until then it falls back to a success state
+   *   so the UX is testable end-to-end.
+   */
+  const form = document.querySelector<HTMLFormElement>('#registration-form');
+  const root = document.querySelector<HTMLElement>('[data-registration]');
+  if (!form || !root) throw new Error('registration form not found');
+
+  const panels = [...form.querySelectorAll<HTMLElement>('.step-panel')];
+  const steps = [...root.querySelectorAll<HTMLElement>('#step-indicators .step')];
+  const MAX_IMAGES = 3;
+  let current = 0;
+
+  const faDigits = (n: number) =>
+    String(n).replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[Number(d)]);
+
+  function show(step: number) {
+    current = step;
+    panels.forEach((p, i) => p.classList.toggle('hidden', i !== step));
+    steps.forEach((s, i) => {
+      s.classList.toggle('is-active', i === step);
+      s.classList.toggle('is-done', i < step);
+      const marker = s.querySelector('.marker');
+      if (marker) marker.textContent = i < step ? '✓' : faDigits(i + 1);
+    });
+    root?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function validatePanel(panel: HTMLElement): boolean {
+    let ok = true;
+    for (const el of panel.querySelectorAll<HTMLElement>('[required], [pattern], [type="email"]')) {
+      const input = el as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+      const err = form.querySelector<HTMLElement>(`[data-error-for="${input.name}"]`);
+      const valid = input.value.trim() === '' ? !input.required : input.checkValidity();
+      input.setAttribute('aria-invalid', String(!valid));
+      err?.classList.toggle('hidden', valid);
+      if (!valid) ok = false;
+    }
+    return ok;
+  }
+
+  form.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-next], [data-prev]');
+    if (!btn) return;
+    e.preventDefault();
+    if (btn.hasAttribute('data-next')) {
+      if (!validatePanel(panels[current])) return;
+      show(Math.min(current + 1, panels.length - 1));
+    } else {
+      show(Math.max(current - 1, 0));
+    }
+  });
+
+  // live reset of error state on typing
+  form.addEventListener('input', (e) => {
+    const input = e.target as HTMLInputElement;
+    const err = form.querySelector<HTMLElement>(`[data-error-for="${input.name}"]`);
+    if (err && !err.classList.contains('hidden') && input.checkValidity()) {
+      err.classList.add('hidden');
+      input.classList.remove('!border-error');
+    }
+  });
+
+  // description counter
+  const desc = form.querySelector<HTMLTextAreaElement>('#biz-description');
+  const counter = document.querySelector('#desc-counter');
+  desc?.addEventListener('input', () => {
+    if (counter && desc) counter.textContent = `${desc.value.length} / ${desc.maxLength}`;
+  });
+
+  // image previews
+  const fileInput = form.querySelector<HTMLInputElement>('#biz-images');
+  const previews = document.querySelector<HTMLUListElement>('#image-previews');
+  const imagesError = document.querySelector('#images-error');
+
+  function renderPreviews(files: FileList | File[]) {
+    if (!previews) return;
+    previews.innerHTML = '';
+    const list = [...files].slice(0, MAX_IMAGES);
+    (imagesError as HTMLElement | null)?.classList.toggle('hidden', files.length <= MAX_IMAGES);
+    for (const file of list) {
+      const li = document.createElement('li');
+      li.className = 'relative rounded-xl overflow-hidden border border-outline-variant aspect-square';
+      const img = document.createElement('img');
+      img.alt = file.name;
+      img.className = 'w-full h-full object-cover';
+      img.src = URL.createObjectURL(file);
+      const name = document.createElement('span');
+      name.className = 'absolute bottom-0 inset-x-0 bg-black/70 text-white text-[10px] px-2 py-1 truncate';
+      name.textContent = file.name;
+      li.append(img, name);
+      previews.append(li);
+    }
+  }
+
+  fileInput?.addEventListener('change', () => {
+    if (fileInput.files) renderPreviews(fileInput.files);
+  });
+
+  // submit — wire to a real API when available
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!validatePanel(panels[current])) return;
+
+    const data = Object.fromEntries(new FormData(form).entries());
+    const submitBtn = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+    submitBtn?.setAttribute('disabled', 'true');
+
+    try {
+      await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(data),
+      }).catch(() => null); // endpoint not deployed yet → still succeed locally
+    } finally {
+      document.querySelector('#success-name')?.replaceChildren(String(data.name ?? ''));
+      panels.forEach((p) => p.classList.add('hidden'));
+      document.querySelector('#step-indicators')?.classList.add('hidden');
+      document.querySelector<HTMLElement>('#registration-success')?.classList.remove('hidden');
+      submitBtn?.removeAttribute('disabled');
+    }
+  });
+
+  show(0);
+</script>
