@@ -1,5 +1,6 @@
 ---
 import Icon from './Icon.astro';
+import { articlesBySlug } from '../data/articles';
 import type { Article } from '../data/content';
 
 interface Props {
@@ -7,6 +8,8 @@ interface Props {
 }
 
 const { article } = Astro.props;
+/** Cards link to the real page only when the article exists in the store. */
+const href = articlesBySlug[article.slug] ? `/articles/${article.slug}` : null;
 ---
 
 <article
@@ -30,20 +33,36 @@ const { article } = Astro.props;
       <span class="text-xs font-label-sm">{article.date}</span>
     </div>
 
-    <h3 class="font-headline-md text-lg text-on-surface mb-3 line-clamp-2 group-hover:text-primary transition-colors">
-      <a href={`/articles/${article.slug}`}>{article.title}</a>
+    <h3 class="font-headline-md text-lg text-on-surface mb-3 line-clamp-2">
+      {
+        href ? (
+          <a class="hover:text-primary transition-colors" href={href}>
+            {article.title}
+          </a>
+        ) : (
+          article.title
+        )
+      }
     </h3>
 
     <p class="text-on-surface-variant text-sm line-clamp-3 mb-4 flex-grow">
       {article.excerpt}
     </p>
 
-    <a
-      class="text-primary font-label-md flex items-center gap-1 mt-auto hover:underline w-fit"
-      href={`/articles/${article.slug}`}
-    >
-      ادامه مطلب
-      <Icon class="text-sm" icon="arrow_back" />
-    </a>
+    {
+      href ? (
+        <a
+          class="text-primary font-label-md flex items-center gap-1 mt-auto hover:underline w-fit"
+          href={href}
+        >
+          ادامه مطلب
+          <Icon class="text-sm" icon="arrow_back" />
+        </a>
+      ) : (
+        <span class="text-on-surface-variant/60 font-label-sm flex items-center gap-1 mt-auto w-fit">
+          به‌زودی منتشر می‌شود
+        </span>
+      )
+    }
   </div>
 </article>

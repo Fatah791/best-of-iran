@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import ArticleBlocks from '../../components/ArticleBlocks.astro';
+import { getAllArticles, type FullArticle } from '../../data/articles';
+
+export function getStaticPaths() {
+  return getAllArticles().map((article) => ({
+    params: { slug: article.slug },
+    props: { article },
+  }));
+}
+
+const { article } = Astro.props as { article: FullArticle };
+---
+
+<BaseLayout description={article.description} title={article.title}>
+  <ArticleLayout article={article}>
+    {article.blocks.map((block) => <ArticleBlocks block={block} />)}
+  </ArticleLayout>
+</BaseLayout>

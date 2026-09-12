@@ -14,6 +14,15 @@ export interface Article {
 
 export const latestArticles: Article[] = [
   {
+    slug: 'best-car-wash-isfahan',
+    title: 'بهترین کارواش‌های اصفهان: رتبه‌بندی تخصصی ۱۴۰۵',
+    excerpt:
+      'بررسی میدانی بیش از ۵۰ مرکز، تحلیل نظرات کاربران و مقایسه قیمت‌ها برای یافتن بهترین کارواش اصفهان.',
+    category: 'کارواش',
+    city: 'اصفهان',
+    date: '۲۵ شهریور ۱۴۰۵',
+  },
+  {
     slug: 'best-italian-restaurants-tehran',
     title: 'بهترین رستوران‌های ایتالیایی تهران: بررسی تخصصی ۵ گزینه برتر',
     excerpt:

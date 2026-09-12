@@ -1,0 +1,171 @@
+---
+import TopNavBar from '../components/TopNavBar.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import Icon from '../components/Icon.astro';
+import type { FullArticle } from '../data/articles';
+
+/**
+ * Article shell: header meta, breadcrumb, sticky TOC sidebar,
+ * mobile sticky bar. Block content is passed via default slot.
+ */
+interface Props {
+  article: FullArticle;
+}
+
+const { article } = Astro.props;
+const tocItems = article.toc;
+const ranked = article.blocks.find((b) => b.type === 'ranked');
+const topPhone =
+  ranked && ranked.type === 'ranked' && ranked.items[0]?.phone
+    ? `tel:${ranked.items[0].phone}`
+    : null;
+---
+
+<slot name="head" />
+
+<div class="premium-bg min-h-screen flex flex-col">
+  <TopNavBar />
+
+  <div class="max-w-screen-xl mx-auto px-margin-mobile md:px-margin-desktop py-lg flex flex-col md:flex-row gap-gutter relative w-full">
+    <!-- TOC Sidebar (Desktop) -->
+    <aside class="hidden md:block w-64 shrink-0">
+      <div class="sticky top-[100px] bg-surface rounded-xl p-md border border-outline-variant">
+        <h4 class="font-bold text-lg mb-sm text-on-surface">فهرست مطالب</h4>
+        <nav class="flex flex-col space-y-3 text-sm text-on-surface-variant">
+          {
+            tocItems.map((item) => (
+              <a class="toc-link pr-2 hover:text-primary" href={`#${item.id}`}>
+                {item.label}
+              </a>
+            ))
+          }
+        </nav>
+      </div>
+    </aside>
+
+    <main class="flex-1 w-full min-w-0">
+      <!-- Breadcrumb -->
+      <nav aria-label="Breadcrumb" class="text-on-surface-variant text-xs font-medium mb-md">
+        <ol class="flex flex-wrap items-center gap-1">
+          <li>
+            <a class="hover:text-primary transition-colors" href="/">خانه</a>
+          </li>
+          {
+            article.breadcrumb.slice(1).map((crumb) => (
+              <li class="flex items-center">
+                <Icon class="mx-1 text-xs" icon="chevron_left" />
+                {crumb.href === '#' ? (
+                  <span class="text-on-surface">{crumb.label}</span>
+                ) : (
+                  <a class="hover:text-primary transition-colors" href={crumb.href}>
+                    {crumb.label}
+                  </a>
+                )}
+              </li>
+            ))
+          }
+        </ol>
+      </nav>
+
+      <!-- Header -->
+      <header class="mb-xl">
+        <h1 class="text-3xl md:text-4xl font-bold text-primary mb-sm leading-tight">
+          {article.h1}
+        </h1>
+        <div class="flex flex-wrap items-center gap-md text-on-surface-variant text-sm font-medium">
+          <span class="flex items-center gap-xs">
+            <Icon class="text-sm" icon="calendar_today" />
+            به‌روزرسانی: {article.updated}
+          </span>
+          <span class="flex items-center gap-xs">
+            <Icon class="text-sm" icon="person" />
+            {article.author}
+          </span>
+          <span class="flex items-center gap-xs">
+            <Icon class="text-sm" icon="timer" />
+            زمان مطالعه: {article.readTime}
+          </span>
+        </div>
+      </header>
+
+      <slot />
+    </main>
+  </div>
+
+  <SiteFooter />
+
+  <!-- Mobile sticky bottom bar -->
+  <div class="fixed bottom-0 w-full bg-surface/90 backdrop-blur-md border-t border-outline-variant p-sm z-50 md:hidden shadow-lg flex gap-2">
+    <a
+      class="bg-surface-variant text-on-surface text-sm font-medium py-3 rounded-lg hover:brightness-110 flex items-center justify-center gap-1 transition-all flex-1"
+      href="#ranked-list"
+    >
+      <Icon class="text-lg" icon="list" />
+      لیست کامل
+    </a>
+    <a
+      class="bg-secondary text-on-secondary text-sm font-medium py-3 rounded-lg hover:brightness-110 flex items-center justify-center gap-1 transition-all flex-[2]"
+      href={topPhone ?? '#ranked-list'}
+    >
+      <Icon class="text-lg" icon="call" />
+      تماس با رتبه ۱
+    </a>
+  </div>
+</div>
+
+<style is:global>
+  .premium-bg {
+    /* Article palette — overrides the site tokens for this page only.
+       Tailwind v4 utilities resolve through these custom properties. */
+    --color-background: #0d0d0f;
+    --color-surface: #1a1a1e;
+    --color-primary: #f5b841;
+
+    background-color: #0d0d0f;
+    background-image:
+      radial-gradient(circle at 15% 50%, #161618, transparent 60%),
+      radial-gradient(circle at 85% 20%, #161618, transparent 60%),
+      radial-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 24px 24px;
+    background-attachment: fixed;
+  }
+
+  .toc-link.active {
+    color: #f5b841;
+    font-weight: 700;
+    border-right: 2px solid #f5b841;
+  }
+
+  details > summary {
+    list-style: none;
+  }
+  details > summary::-webkit-details-marker {
+    display: none;
+  }
+</style>
+
+<script>
+  // Scroll-spy: highlight the TOC entry of the section in view.
+  const links = new Map(
+    [...document.querySelectorAll<HTMLAnchorElement>('.toc-link')].map((a) => [
+      a.getAttribute('href')!.slice(1),
+      a,
+    ]),
+  );
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        links.forEach((a) => a.classList.remove('active'));
+        links.get(entry.target.id)?.classList.add('active');
+      }
+    },
+    { rootMargin: '-20% 0px -70% 0px' },
+  );
+
+  for (const id of links.keys()) {
+    const section = document.getElementById(id);
+    if (section) observer.observe(section);
+  }
+</script>

@@ -1,0 +1,336 @@
+---
+import Icon from './Icon.astro';
+import type { ArticleBlock } from '../data/articles';
+
+interface Props {
+  block: ArticleBlock;
+}
+
+const { block } = Astro.props;
+
+const faNum = (n: number | string) =>
+  String(n).replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[Number(d)]);
+const rankBadge = (n: number) => faNum(n);
+---
+
+{block.type === 'quickAnswer' && (
+  <div class="bg-surface rounded-xl p-md border border-outline-variant mb-xl relative overflow-hidden shadow-lg" id="quick-answer">
+    <div class="absolute top-0 right-0 w-full h-1 bg-gradient-to-l from-primary to-secondary"></div>
+    <div class="flex items-center gap-sm mb-sm">
+      <Icon class="text-primary text-2xl" icon="bolt" />
+      <h2 class="text-xl font-bold text-on-surface">خلاصه سریع (۳ مورد برتر)</h2>
+    </div>
+    <ul class="space-y-sm text-base text-on-surface-variant">
+      {
+        block.items.map((item) => (
+          <li class="flex items-center gap-sm">
+            <span
+              class:list={[
+                'rounded-full w-6 h-6 flex items-center justify-center font-bold text-sm shrink-0',
+                item.rank === 1
+                  ? 'bg-primary text-on-primary'
+                  : 'bg-surface-variant text-on-surface',
+              ]}
+            >
+              {rankBadge(item.rank)}
+            </span>
+            <span>
+              <strong class="text-on-surface">{item.name}:</strong> {item.note}
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+)}
+
+{block.type === 'educational' && (
+  <section class="mb-xl" id="educational">
+    <h2 class="text-2xl font-bold text-primary mb-md">{block.title}</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-md mb-lg">
+      <div class="space-y-4">
+        {
+          block.features.map((item) => (
+            <div class="flex items-start gap-3">
+              <Icon class="text-secondary mt-1" icon="check_circle" />
+              <div>
+                <h4 class="font-bold text-on-surface">{item.title}</h4>
+                <p class="text-sm text-on-surface-variant">{item.body}</p>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+
+      <div class="bg-surface border border-outline-variant rounded-lg p-md self-start">
+        <h3 class="font-bold text-on-surface mb-md flex items-center gap-2">
+          <Icon class="text-primary" icon="analytics" />
+          {block.criteria.panelTitle}
+        </h3>
+        <div class="space-y-4">
+          {
+            block.criteria.items.map((item) => (
+              <div>
+                <div class="flex justify-between mb-1">
+                  <span class="text-sm text-on-surface">{item.label}</span>
+                  <span class="text-sm font-bold text-primary">
+                    {faNum(item.percent)}٪
+                  </span>
+                </div>
+                <div class="w-full bg-surface-variant rounded-full h-1.5">
+                  <div class="bg-primary h-1.5 rounded-full" style={`width: ${item.percent}%`}></div>
+                </div>
+                <p class="text-[11px] text-on-surface-variant mt-1">{item.note}</p>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+)}
+
+{block.type === 'tip' && (
+  <div class="bg-primary/10 border-r-4 border-primary p-md rounded-l-lg mb-lg mt-lg">
+    <div class="flex items-center gap-2 mb-2">
+      <Icon class="text-primary" icon="lightbulb" />
+      <h4 class="font-bold text-primary">{block.title}</h4>
+    </div>
+    <p class="text-sm text-on-surface-variant leading-relaxed" set:html={block.bodyHtml}></p>
+  </div>
+)}
+
+{block.type === 'cards' && (
+  <div class="mb-lg">
+    <h3 class="text-xl font-bold text-on-surface mb-md flex items-center gap-2">
+      <Icon class="text-primary" icon="verified_user" />
+      {block.title}
+    </h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-sm">
+      {
+        block.items.map((item) => (
+          <div class="bg-surface-variant/20 p-sm rounded-lg border border-outline-variant/30">
+            <h5 class="font-bold text-sm text-primary mb-1">{item.title}</h5>
+            <p class="text-xs text-on-surface-variant">{item.body}</p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+)}
+
+{block.type === 'prose' && (
+  <div class="max-w-none text-on-surface-variant leading-relaxed">
+    <p set:html={block.html}></p>
+  </div>
+)}
+
+{block.type === 'ranked' && (
+  <section class="space-y-lg mb-xl" id="ranked-list">
+    <h2 class="text-2xl font-bold text-primary mb-md">{block.title}</h2>
+    {
+      block.items.map((biz) => (
+        <article class="bg-surface rounded-xl border border-outline-variant overflow-hidden shadow-md">
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-0">
+            {biz.image && (
+              <div class="md:col-span-4 h-64 md:h-auto bg-surface-variant relative">
+                <img
+                  alt={biz.name}
+                  class="w-full h-full object-cover"
+                  loading="lazy"
+                  src={biz.image}
+                />
+                {biz.editorPick && (
+                  <div class="absolute top-sm right-sm bg-primary text-on-primary px-sm py-xs rounded-lg text-xs font-bold flex items-center gap-xs">
+                    <Icon class="text-sm" icon="verified" />
+                    انتخاب سردبیر
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div class:list={[biz.image ? 'md:col-span-8' : 'md:col-span-12', 'p-md flex flex-col justify-between']}>
+              <div>
+                <div class="flex justify-between items-start mb-sm gap-2">
+                  <div>
+                    <div class="flex items-center gap-sm mb-xs">
+                      <span class="bg-primary text-on-primary font-bold px-sm py-xs rounded-lg text-sm">
+                        #{rankBadge(biz.rank)}
+                      </span>
+                      <h3 class="text-xl font-bold text-on-surface">{biz.name}</h3>
+                    </div>
+                    <p class="text-sm text-on-surface-variant mb-xs">{biz.tagline}</p>
+                    <div class="flex items-center gap-xs text-primary text-sm">
+                      <span aria-label={`امتیاز ${biz.rating}`} class="flex" role="img">
+                        <Icon class="[font-variation-settings:'FILL'_1]" icon="star" />
+                        <Icon class="[font-variation-settings:'FILL'_1]" icon="star" />
+                        <Icon class="[font-variation-settings:'FILL'_1]" icon="star" />
+                        <Icon class="[font-variation-settings:'FILL'_1]" icon="star" />
+                        <Icon class="[font-variation-settings:'FILL'_1]" icon="star" />
+                      </span>
+                      <span class="text-on-surface-variant ml-2">
+                        ({biz.rating} - {biz.reviews} نظر)
+                      </span>
+                    </div>
+                  </div>
+                  <span class="bg-secondary/20 text-secondary px-sm py-xs rounded text-xs font-bold flex items-center gap-xs shrink-0">
+                    <span class="relative flex h-2 w-2 mr-1">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span>
+                    </span>
+                    باز است
+                  </span>
+                </div>
+
+                <div class="flex flex-wrap gap-sm mb-md text-sm">
+                  {
+                    biz.badges.map((badge) => (
+                      <span
+                        class:list={[
+                          'px-2 py-1 rounded text-xs',
+                          badge.tone === 'error'
+                            ? 'bg-surface-variant text-error border border-error/30'
+                            : 'bg-surface-variant text-on-surface',
+                        ]}
+                      >
+                        {badge.label}
+                      </span>
+                    ))
+                  }
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-on-surface-variant mb-md border-t border-outline-variant/30 pt-md">
+                  <span class="flex items-center gap-2">
+                    <Icon class="text-base" icon="location_on" />
+                    {biz.address}
+                  </span>
+                  <span class="flex items-center gap-2">
+                    <Icon class="text-base" icon="schedule" />
+                    {biz.hours}
+                  </span>
+                  <span class="flex items-center gap-2">
+                    <Icon class="text-base" icon="payments" />
+                    محدوده قیمت: {biz.priceTier}
+                  </span>
+                </div>
+              </div>
+
+              <div class="flex flex-col sm:flex-row flex-wrap gap-sm mt-auto">
+                {
+                  biz.phone && (
+                    <a
+                      class="bg-secondary text-on-secondary font-medium text-sm px-4 py-2 rounded-lg hover:brightness-110 flex items-center justify-center gap-2 transition-all flex-1"
+                      href={`tel:${biz.phone}`}
+                    >
+                      <Icon icon="call" />
+                      تماس
+                    </a>
+                  )
+                }
+                <a
+                  class="bg-[#25D366] text-white font-medium text-sm px-4 py-2 rounded-lg hover:brightness-110 flex items-center justify-center gap-2 transition-all flex-1"
+                  href={biz.whatsapp ? `https://wa.me/${biz.whatsapp}` : '#'}
+                >
+                  <Icon icon="chat" />
+                  واتس‌اپ
+                </a>
+                <a
+                  class="bg-surface border border-outline-variant text-on-surface font-medium text-sm px-4 py-2 rounded-lg hover:bg-surface-variant flex items-center justify-center gap-2 transition-all flex-1"
+                  href={`https://map.norimaps.com/?q=${encodeURIComponent(biz.address)}`}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  <Icon icon="directions" />
+                  مسیریابی
+                </a>
+              </div>
+
+              {
+                biz.review && (
+                  <details class="mt-md border-t border-outline-variant pt-sm group">
+                    <summary class="text-sm font-medium text-primary cursor-pointer flex items-center justify-between">
+                      مشاهده نظرات و نقشه
+                      <Icon class="group-open:rotate-180 transition-transform" icon="expand_more" />
+                    </summary>
+                    <div class="mt-md space-y-sm">
+                      <div class="bg-surface-variant p-3 rounded-lg text-sm text-on-surface-variant">
+                        <div class="flex justify-between items-center mb-1">
+                          <strong class="text-on-surface">{biz.review.author}</strong>
+                          <span class="text-xs">{biz.review.when}</span>
+                        </div>
+                        {biz.review.text}
+                      </div>
+                    </div>
+                  </details>
+                )
+              }
+            </div>
+          </div>
+        </article>
+      ))
+    }
+  </section>
+)}
+
+{block.type === 'comparison' && (
+  <section class="mb-xl" id="comparison">
+    <h2 class="text-2xl font-bold text-primary mb-md">{block.title}</h2>
+    <div class="overflow-x-auto bg-surface rounded-xl border border-outline-variant">
+      <table class="w-full text-sm text-right text-on-surface-variant">
+        <thead class="bg-surface-variant text-on-surface">
+          <tr>
+            {block.columns.map((col) => <th class="p-3 font-medium">{col}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+          {
+            block.rows.map((row) => (
+              <tr class="border-b border-outline-variant last:border-0">
+                <td class="p-3 font-bold text-on-surface">{row.name}</td>
+                <td class="p-3 text-primary">{row.score}</td>
+                <td class="p-3">{row.price}</td>
+                <td class="p-3">
+                  <Icon class:list={['text-sm', row.nano ? 'text-secondary' : 'text-on-surface-variant']} icon={row.nano ? 'check' : 'close'} />
+                </td>
+                <td class="p-3">
+                  <Icon class:list={['text-sm', row.lounge ? 'text-secondary' : 'text-on-surface-variant']} icon={row.lounge ? 'check' : 'close'} />
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+)}
+
+{block.type === 'methodologyNote' && (
+  <section class="mb-xl bg-surface-variant/30 rounded-xl p-md border border-outline-variant" id="methodology">
+    <div class="flex items-center gap-2 mb-sm">
+      <Icon class="text-primary" icon="info" />
+      <h3 class="text-lg font-bold text-on-surface">{block.title}</h3>
+    </div>
+    <p class="text-sm text-on-surface-variant leading-relaxed">{block.body}</p>
+  </section>
+)}
+
+{block.type === 'faq' && (
+  <section class="mb-xl" id="faq">
+    <h2 class="text-2xl font-bold text-primary mb-md">{block.title}</h2>
+    <div class="space-y-sm">
+      {
+        block.items.map((item) => (
+          <details class="group bg-surface border border-outline-variant rounded-lg [&_summary::-webkit-details-marker]:hidden">
+            <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-4 text-on-surface font-medium">
+              {item.q}
+              <Icon class="shrink-0 transition duration-300 group-open:-rotate-180" icon="expand_more" />
+            </summary>
+            <div class="border-t border-outline-variant px-4 py-3 text-sm text-on-surface-variant">
+              {item.a}
+            </div>
+          </details>
+        ))
+      }
+    </div>
+  </section>
+)}

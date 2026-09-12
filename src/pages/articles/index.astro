@@ -1,0 +1,31 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TopNavBar from '../../components/TopNavBar.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import { latestArticles } from '../../data/content';
+---
+
+<BaseLayout
+  description="مقالات و بررسی‌های تخصصی تیم بست آف ایران."
+  title="مقالات و بررسی‌ها | Best-of Iran"
+>
+  <TopNavBar />
+
+  <main class="flex-grow w-full px-margin-mobile md:px-margin-desktop py-xl">
+    <div class="max-w-screen-2xl mx-auto">
+      <h1 class="font-headline-xl text-headline-xl text-on-surface mb-2">
+        جدیدترین بررسی‌ها
+      </h1>
+      <p class="font-body-lg text-body-lg text-on-surface-variant mb-lg">
+        مقالات و بررسی‌های تخصصی تیم ما.
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {latestArticles.map((article) => <ArticleCard article={article} />)}
+      </div>
+    </div>
+  </main>
+
+  <SiteFooter />
+</BaseLayout>
