@@ -1,0 +1,9 @@
+---
+/** Emits a JSON-LD block (schema.org) from a plain object / array. */
+interface Props {
+  data: object | object[];
+}
+const { data } = Astro.props;
+---
+
+<script set:html={JSON.stringify(data)} type="application/ld+json"></script>

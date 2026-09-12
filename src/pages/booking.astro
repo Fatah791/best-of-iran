@@ -1,0 +1,31 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import Icon from '../components/Icon.astro';
+---
+
+<PageLayout
+  description="رزرو سریع میز و نوبت در بهترین کسب‌وکارها — به‌زودی."
+  heading="رزرو سریع"
+  subheading="این قابلیت در نسخه بعدی فعال می‌شود."
+  title="رزرو سریع"
+>
+  <div class="max-w-xl mx-auto text-center bg-surface-container rounded-2xl border border-surface-variant p-lg">
+    <span class="inline-flex w-20 h-20 rounded-full bg-primary/10 items-center justify-center mb-md">
+      <Icon class="text-5xl text-primary" icon="event_available" />
+    </span>
+    <h2 class="font-headline-md text-lg text-on-surface mb-2">در حال توسعه است</h2>
+    <p class="text-on-surface-variant text-sm mb-6">
+      به‌زودی می‌توانید بدون تماس تلفنی، میز رستوران، نوبت کارواش یا اتاق هتل را
+      مستقیم از پروفایل کسب‌وکار رزرو کنید. فعلاً از دکمه «تماس» در هر صفحه
+      استفاده کنید.
+    </p>
+    <div class="flex flex-col sm:flex-row justify-center gap-3">
+      <a class="bg-primary text-on-primary px-6 py-3 rounded-xl font-label-md hover:brightness-110 transition-all" href="/trending">
+        پربازدیدهای هفته
+      </a>
+      <a class="border border-outline-variant px-6 py-3 rounded-xl font-label-md hover:bg-surface-variant transition-colors" href="/register">
+        ثبت کسب‌وکار
+      </a>
+    </div>
+  </div>
+</PageLayout>

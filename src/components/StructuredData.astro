@@ -1,0 +1,34 @@
+---
+/** Site-wide structured data: Organization + WebSite w/ SearchAction. */
+import JsonLd from './JsonLd.astro';
+import { site } from '../data/site';
+
+const data = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: site.name,
+    alternateName: site.nameFa,
+    url: site.url,
+    logo: `${site.url}/favicon.svg`,
+    description: site.description,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: site.name,
+    url: site.url,
+    inLanguage: 'fa',
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${site.url}/search?q={search_term_string}`,
+      },
+      'query-input': 'required name=search_term_string',
+    },
+  },
+];
+---
+
+<JsonLd data={data} />

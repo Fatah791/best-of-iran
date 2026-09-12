@@ -1,18 +1,21 @@
 ---
+import { Image } from 'astro:assets';
+import heroBg from '../assets/hero-bg.jpg';
 import Icon from './Icon.astro';
 ---
 
 <section class="relative w-full flex items-center justify-center px-margin-mobile md:px-margin-desktop py-xl overflow-hidden bg-surface-container-low">
   <div class="absolute inset-0">
-    <img
+    <Image
       alt=""
       aria-hidden="true"
       class="w-full h-full object-cover opacity-30 mix-blend-overlay"
       decoding="async"
-      height="279"
+      formats={['avif', 'webp', 'jpeg']}
+      heights={[432, 768]}
       loading="eager"
-      src="/hero-bg.jpg"
-      width="512"
+      src={heroBg}
+      widths={[768, 1280, 1600]}
     />
   </div>
 

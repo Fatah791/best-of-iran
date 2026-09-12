@@ -1,19 +1,20 @@
 ---
 import { registration } from '../data/site';
+import Icon from './Icon.astro';
 ---
 
 <aside class="lg:col-span-4 space-y-md">
   <!-- Trust Section -->
   <div class="bg-surface-container rounded-3xl border border-outline-variant p-md">
     <h3 class="font-headline-md text-headline-md text-on-surface mb-sm flex items-center gap-2">
-      <span class="material-symbols-outlined text-primary">verified</span>
+      <Icon class="text-primary" icon="verified" />
       {registration.trust.title}
     </h3>
     <ul class="space-y-sm mt-md">
       {
         registration.trust.items.map((item) => (
           <li class="flex items-start gap-3">
-            <span class:list={['material-symbols-outlined mt-1', item.tone]}>{item.icon}</span>
+            <Icon class:list={['mt-1', item.tone]} icon={item.icon} />
             <div>
               <h4 class="font-label-md text-label-md text-on-surface">{item.title}</h4>
               <p class="font-body-md text-body-md text-on-surface-variant text-sm mt-1">

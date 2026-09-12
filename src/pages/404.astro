@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TopNavBar from '../components/TopNavBar.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../data/site';
+---
+
+<BaseLayout description="صفحه مورد نظر پیدا نشد." title={`خطای ۴۰۴ | ${site.nameFa}`}>
+  <TopNavBar />
+
+  <main class="flex-grow flex items-center justify-center px-margin-mobile py-xl text-center">
+    <div class="max-w-md">
+      <span class="inline-flex w-24 h-24 rounded-full bg-surface-container border border-outline-variant items-center justify-center mb-md">
+        <Icon class="text-6xl text-outline" icon="explore_off" />
+      </span>
+      <h1 class="font-headline-xl text-headline-xl text-on-surface mb-2">۴۰۴</h1>
+      <p class="font-body-lg text-body-lg text-on-surface-variant mb-lg">
+        آدرسی که دنبال می‌کنید پیدا نشد — شاید جابه‌جا شده باشد.
+      </p>
+      <div class="flex flex-col sm:flex-row justify-center gap-3">
+        <a class="bg-primary text-on-primary px-6 py-3 rounded-xl font-label-md hover:brightness-110 transition-all" href="/">
+          بازگشت به خانه
+        </a>
+        <a class="border border-outline-variant px-6 py-3 rounded-xl font-label-md hover:bg-surface-container transition-colors" href="/search">
+          جستجوی کسب‌وکارها
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <SiteFooter />
+</BaseLayout>

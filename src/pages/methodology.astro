@@ -1,0 +1,119 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TopNavBar from '../components/TopNavBar.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import MobileDock from '../components/MobileDock.astro';
+import Icon from '../components/Icon.astro';
+import { site, methodology } from '../data/site';
+
+const steps = [
+  {
+    icon: 'groups',
+    title: '۱. انتخاب هدفمند',
+    body: 'هر دسته‌بندی در هر شهر با معیارهای ورود خاص خودش بررسی می‌شود؛ فهرست اولیه از جستجوهای واقعی کاربران و نقشه‌ها ساخته می‌شود.',
+  },
+  {
+    icon: 'person_search',
+    title: '۲. بازدید میدانی ناشناس',
+    body: 'ارزیاب ما بدون اطلاع قبلی و مانند یک مشتری عادی وارد کسب‌وکار می‌شود، سفارش می‌دهد و فرآیند خدمت را از ابتدا تا انتها ثبت می‌کند.',
+  },
+  {
+    icon: 'assignment',
+    title: '۳. امتیازدهی با ۵۰+ شاخص',
+    body: 'چک‌لیست استاندارد ما شامل بهداشت، کیفیت خدمت، برخورد پرسنل، سرعت، تناسب قیمت و امکانات رفاهی است. هر شاخص وزن مشخصی دارد.',
+  },
+  {
+    icon: 'query_stats',
+    title: '۴. تحلیل داده‌محور نظرات',
+    body: 'نظرات کاربران در نقشه‌ها و شبکه‌های اجتماعی با الگوریتم تشخیص نظرات فیک غربال می‌شوند و فقط بازخوردهای اثبات‌شده در امتیاز نهایی محاسبه می‌شوند.',
+  },
+  {
+    icon: 'update',
+    title: '۵. بازبینی دوره‌ای',
+    body: 'رتبه‌ها ثابت نیستند. هر کسب‌وکار حداقل سالی یک‌بار و در صورت تغییر امتیاز، دوباره ارزیابی می‌شود.',
+  },
+];
+
+const criteriaWeights = methodology.criteria.map((c, i) => ({
+  ...c,
+  weight: [40, 20, 20, 20][i] ?? 0,
+}));
+const sum = criteriaWeights.reduce((s, c) => s + c.weight, 0) || 100;
+---
+
+<BaseLayout
+  description="روش ارزیابی بست آف ایران: بازدید میدانی ناشناس، ۵۰+ شاخص کیفیت و تحلیل نظرات واقعی."
+  title={`متدولوژی | ${site.nameFa}`}
+>
+  <TopNavBar />
+
+  <main class="flex-grow w-full max-w-3xl mx-auto px-margin-mobile md:px-margin-desktop py-xl pb-28 md:pb-xl" id="main">
+    <header class="text-center mb-xl">
+      <span class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-container/10 mb-md">
+        <Icon class="text-3xl text-primary" icon="fact_check" />
+      </span>
+      <h1 class="font-headline-xl text-headline-xl text-on-surface mb-base">
+        متدولوژی ارزیابی ما
+      </h1>
+      <p class="font-body-lg text-body-lg text-on-surface-variant">{methodology.intro}</p>
+    </header>
+
+    <div class="space-y-md mb-xl">
+      {
+        steps.map((step) => (
+          <div class="bg-surface-container rounded-2xl border border-surface-variant p-md flex gap-4" data-reveal="">
+            <span class="w-12 h-12 rounded-full bg-surface shrink-0 border border-outline-variant flex items-center justify-center">
+              <Icon class="text-2xl text-primary" icon={step.icon} />
+            </span>
+            <div>
+              <h2 class="font-headline-md text-lg text-on-surface mb-1">{step.title}</h2>
+              <p class="text-sm text-on-surface-variant leading-relaxed">{step.body}</p>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+
+    <section class="bg-surface-container rounded-2xl border border-surface-variant p-md mb-xl">
+      <h2 class="font-headline-md text-headline-md text-on-surface mb-md flex items-center gap-2">
+        <Icon class="text-primary" icon="analytics" />
+        وزن شاخص‌های کلیدی
+      </h2>
+      <div class="space-y-4">
+        {
+          criteriaWeights.map((c) => (
+            <div>
+              <div class="flex justify-between mb-1">
+                <span class="text-sm text-on-surface">{c.label}</span>
+                <span class="text-sm font-bold text-primary">{c.weight}٪</span>
+              </div>
+              <div class="w-full bg-surface-variant rounded-full h-1.5">
+                <div class="bg-primary h-1.5 rounded-full" style={`width: ${c.weight}%`}></div>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+      <p class="text-xs text-on-surface-variant mt-4">
+        جمع وزن‌ها: {sum}٪ — شاخص‌های ریزتر در چک‌لیست ۵۰ موردی هر دسته‌بندی لحاظ می‌شوند.
+      </p>
+    </section>
+
+    <section class="bg-primary/5 border border-primary/30 rounded-2xl p-md">
+      <h2 class="font-headline-md text-lg text-on-surface mb-2 flex items-center gap-2">
+        <Icon class="text-primary" icon="gpp_maybe" />
+        استقلال و شفافیت
+      </h2>
+      <p class="text-sm text-on-surface-variant leading-relaxed">
+        هیچ کسب‌وکاری با پرداخت هزینه در رتبه‌بندی‌ها جای نمی‌گیرد. پلن ویژه
+        (Premium) تنها امکان نمایش بصری بهتر و دسترسی به آمار را می‌دهد و
+        هیچ تاثیری بر امتیاز ندارد. اگر خطایی در ارزیابی دیدید، از طریق
+        <a class="text-primary underline hover:text-primary-fixed" href="/contact">تماس با ما</a>
+        گزارش دهید تا در بازبینی بعدی اصلاح شود.
+      </p>
+    </section>
+  </main>
+
+  <MobileDock />
+  <SiteFooter />
+</BaseLayout>

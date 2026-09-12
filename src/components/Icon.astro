@@ -1,4 +1,11 @@
 ---
+import { icons } from '../data/icons';
+
+/**
+ * Inline SVG icon (Material Symbols, baked subset). Replaces the 672KB
+ * icon font; sizes follow font-size via width/height:1em, colors via
+ * fill:currentColor — so existing text-size and text-color classes work.
+ */
 interface Props {
   icon: string;
   class?: string;
@@ -6,13 +13,34 @@ interface Props {
 }
 
 const { icon, class: className, title } = Astro.props;
+const glyph = icons[icon];
+
+if (!glyph) console.warn(`[Icon] missing glyph: "${icon}"`);
+
+const viewBox = glyph?.viewBox ?? '0 -960 960 960';
 ---
 
-<span
-  aria-hidden={title ? undefined : 'true'}
-  aria-label={title}
-  class:list={['material-symbols-outlined', className]}
-  title={title}
->
-  {icon}
-</span>
+{
+  glyph && (
+    <svg
+      aria-hidden={title ? undefined : 'true'}
+      aria-label={title}
+      class:list={['icon', 'shrink-0', className]}
+      fill="currentColor"
+      height="1em"
+      role={title ? 'img' : undefined}
+      viewBox={viewBox}
+      width="1em"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      {glyph.d.map((d) => <path d={d} fill-rule="evenodd" />)}
+    </svg>
+  )
+}
+
+<style>
+  .icon {
+    display: inline-block;
+    vertical-align: -0.125em;
+  }
+</style>

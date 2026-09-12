@@ -115,6 +115,7 @@
 @layer base {
   html {
     font-family: 'Vazirmatn Variable', ui-sans-serif, system-ui, sans-serif;
+    scroll-behavior: smooth;
   }
 
   body {
@@ -122,22 +123,25 @@
     color: var(--color-on-surface);
   }
 
-  /* Material Symbols icon font */
-  .material-symbols-outlined {
-    font-family: 'Material Symbols Outlined';
-    font-weight: normal;
-    font-style: normal;
-    line-height: 1;
-    letter-spacing: normal;
-    text-transform: none;
-    display: inline-block;
-    white-space: nowrap;
-    word-wrap: normal;
-    direction: ltr;
-    -webkit-font-feature-settings: 'liga';
-    -webkit-font-smoothing: antialiased;
-    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-    user-select: none;
+  /* Visible keyboard focus everywhere (brand gold ring) */
+  :focus-visible {
+    outline: 2px solid var(--color-primary-container);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Respect users who prefer no motion */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 
@@ -147,4 +151,44 @@
   }
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Static shimmer for image placeholders — calmer than infinite pulse.
+   With reduced-motion it degrades to a flat surface. */
+@utility skeleton {
+  background-color: var(--color-surface-variant);
+  background-image: linear-gradient(
+    100deg,
+    transparent 30%,
+    rgb(255 255 255 / 0.04) 50%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: skeleton-sweep 2.2s ease-in-out infinite;
+}
+
+@keyframes skeleton-sweep {
+  from {
+    background-position: 150% 0;
+  }
+  to {
+    background-position: -50% 0;
+  }
+}
+
+/* Scroll-reveal — elements opt in with [data-reveal].
+   Hidden state is applied by JS only when motion is allowed, so no-JS
+   and reduced-motion users always see full content. */
+[data-reveal].reveal-pending {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.55s ease,
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+[data-reveal].reveal-shown {
+  opacity: 1;
+  transform: none;
 }

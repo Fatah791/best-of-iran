@@ -47,6 +47,13 @@ export const categories = [
   { slug: 'hotels', label: 'هتل‌ها', icon: 'hotel' },
 ];
 
+/** Full set of directory categories (superset of the homepage grid). */
+export const directoryCategories: typeof categories = [
+  ...categories,
+  { slug: 'medical', label: 'خدمات پزشکی', icon: 'medical_services' },
+  { slug: 'lawyers', label: 'وکلای پایه یک', icon: 'gavel' },
+];
+
 /** Options for the hero search selects. */
 export const searchCities = cities.slice(0, 3);
 export const searchCategories = [
@@ -129,9 +136,9 @@ export const footerLinks = [
 ];
 
 export const mobileDock = [
-  { icon: 'call', label: 'تماس تلفنی', href: 'tel:' },
-  { icon: 'chat', label: 'واتس‌اپ', href: 'https://wa.me/' },
-  { icon: 'event_available', label: 'رزرو سریع', href: '/booking' },
+  { icon: 'search', label: 'جستجو', href: '/search' },
+  { icon: 'add_business', label: 'ثبت کسب‌وکار', href: '/register' },
+  { icon: 'public', label: 'متدولوژی', href: '/methodology' },
 ];
 
 /* ------------------------------------------------------------------ *

@@ -1,0 +1,177 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import Icon from '../../components/Icon.astro';
+import JsonLd from '../../components/JsonLd.astro';
+import { businesses, byCategory, fa, faRating } from '../../data/businesses';
+import { cities, categories, site } from '../../data/site';
+
+export function getStaticPaths() {
+  return businesses.map((b) => ({
+    params: { slug: b.slug },
+    props: { business: b },
+  }));
+}
+
+const { business } = Astro.props;
+const city = cities.find((c) => c.slug === business.city);
+const category = categories.find((c) => c.slug === business.category);
+const similar = byCategory(business.category).filter((b) => b.slug !== business.slug).slice(0, 3);
+const stars = [1, 2, 3, 4, 5];
+const mapUrl = `https://map.norimaps.com/?q=${encodeURIComponent(business.address)}`;
+
+const ld = {
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  name: business.name,
+  description: business.description,
+  image: business.image ? new URL(business.image, Astro.site).href : undefined,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: business.address,
+    addressLocality: city?.label,
+    addressCountry: 'IR',
+  },
+  telephone: business.phone,
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: business.rating,
+    reviewCount: business.reviews,
+    bestRating: 5,
+  },
+  url: new URL(Astro.url.pathname, Astro.site).href,
+};
+---
+
+<PageLayout
+  description={`${business.tagline} — ${business.name} در ${city?.label ?? ''}، امتیاز ${business.rating} از ${fa(business.reviews)} نظر.`}
+  heading={business.name}
+  subheading={business.tagline}
+  title={business.name}
+>
+  <JsonLd data={ld} slot="head" />
+  <div slot="actions" class="flex flex-wrap items-center gap-3 mt-2">
+    <span class="flex items-center gap-1 text-primary font-bold bg-primary/10 px-3 py-1.5 rounded-lg text-sm">
+      <Icon class="text-lg" icon="starFilled" />
+      {faRating(business.rating)}
+      <span class="text-on-surface-variant font-normal text-xs">({fa(business.reviews)} نظر)</span>
+    </span>
+    {
+      business.verified && (
+        <span class="flex items-center gap-1 text-secondary text-sm bg-secondary/10 px-3 py-1.5 rounded-lg font-label-md">
+          <Icon class="text-lg" icon="verified" />
+          تایید شده
+        </span>
+      )
+    }
+    {city && <a class="text-sm text-on-surface-variant hover:text-primary flex items-center gap-1" href={`/cities/${city.slug}`}><Icon class="text-sm" icon="my_location" />{city.label}</a>}
+    {category && <a class="text-sm text-on-surface-variant hover:text-primary flex items-center gap-1" href={`/categories/${category.slug}`}><Icon class="text-sm" icon="category" />{category.label}</a>}
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-lg">
+    <div class="lg:col-span-2 space-y-md">
+      <div class="rounded-2xl overflow-hidden border border-surface-variant bg-surface-variant">
+        {
+          business.image ? (
+            <img alt={business.name} class="w-full max-h-96 object-cover" src={business.image} />
+          ) : (
+            <div aria-label={`تصویر ${business.name}`} class="skeleton w-full h-64 md:h-80" role="img"></div>
+          )
+        }
+      </div>
+
+      <section class="bg-surface-container rounded-2xl border border-surface-variant p-md">
+        <h2 class="font-headline-md text-lg text-on-surface mb-3">درباره {business.name}</h2>
+        <p class="text-on-surface-variant leading-relaxed">{business.description}</p>
+        <div class="flex flex-wrap gap-2 mt-4">
+          {business.tags.map((t) => <span class="bg-surface-variant/60 text-on-surface-variant px-3 py-1 rounded-full text-xs">{t}</span>)}
+        </div>
+      </section>
+
+      <section class="bg-surface-container rounded-2xl border border-surface-variant p-md">
+        <h2 class="font-headline-md text-lg text-on-surface mb-3">ارزیابی کاربران</h2>
+        <div class="flex items-center gap-1 text-primary mb-2" aria-label={`امتیاز ${business.rating} از ۵`}>
+          {stars.map((n) => <Icon class="text-xl" icon="starFilled" />)}
+        </div>
+        <p class="text-sm text-on-surface-variant">
+          بر پایه {fa(business.reviews)} نظر اثبات‌شده و بازدید میدانی تیم ما.
+        </p>
+      </section>
+    </div>
+
+    <!-- Contact sidebar -->
+    <aside class="space-y-md">
+      <div class="bg-surface-container rounded-2xl border border-surface-variant p-md sticky top-24">
+        <h2 class="font-headline-md text-lg text-on-surface mb-4">اطلاعات تماس</h2>
+        <ul class="space-y-3 text-sm text-on-surface-variant">
+          <li class="flex items-start gap-2">
+            <Icon class="text-primary mt-0.5" icon="location_on" />
+            <a class="hover:text-primary" href={mapUrl} rel="noopener noreferrer" target="_blank">{business.address}</a>
+          </li>
+          {business.hours && (
+            <li class="flex items-center gap-2">
+              <Icon class="text-primary" icon="schedule" />
+              {business.hours}
+            </li>
+          )}
+          <li class="flex items-center gap-2">
+            <Icon class="text-primary" icon="payments" />
+            محدوده قیمت: {business.priceTier}
+          </li>
+        </ul>
+
+        <div class="grid grid-cols-1 gap-2 mt-6">
+          {
+            business.phone ? (
+              <a class="bg-primary text-on-primary px-4 py-3 rounded-xl font-label-md flex items-center justify-center gap-2 hover:brightness-110 transition-all" href={`tel:${business.phone}`}>
+                <Icon icon="call" />
+                تماس تلفنی
+              </a>
+            ) : (
+              <span class="bg-surface-variant/50 text-on-surface-variant px-4 py-3 rounded-xl font-label-md flex items-center justify-center gap-2 cursor-not-allowed" title="شماره تماس تایید نشده">
+                <Icon icon="call" />
+                شماره تماس ثبت نشده
+              </span>
+            )
+          }
+          {
+            business.whatsapp && (
+              <a class="bg-[#25D366] text-white px-4 py-3 rounded-xl font-label-md flex items-center justify-center gap-2 hover:brightness-110 transition-all" href={`https://wa.me/${business.whatsapp}`} rel="noopener noreferrer" target="_blank">
+                <Icon icon="chat" />
+                واتس‌اپ
+              </a>
+            )
+          }
+          <a class="border border-outline-variant text-on-surface px-4 py-3 rounded-xl font-label-md flex items-center justify-center gap-2 hover:bg-surface-variant transition-colors" href={mapUrl} rel="noopener noreferrer" target="_blank">
+            <Icon icon="directions" />
+            مسیریابی
+          </a>
+        </div>
+      </div>
+
+      <div class="bg-primary/5 border border-primary/30 rounded-2xl p-md text-center">
+        <p class="text-sm text-on-surface-variant mb-3">
+          صاحب {business.name} هستید؟
+        </p>
+        <a class="text-primary font-label-md underline hover:text-primary-fixed" href="/register">
+          پروفایل خود را تکمیل کنید
+        </a>
+      </div>
+    </aside>
+  </div>
+
+  {
+    similar.length > 0 && (
+      <section class="mt-xl">
+        <h2 class="font-headline-md text-headline-md text-on-surface mb-md">
+          مورد‌های مشابه در {category?.label}
+        </h2>
+        <p class="text-sm text-on-surface-variant mb-md">
+          برای دیدن فهرست کامل به صفحه <a class="text-primary underline" href={`/categories/${category?.slug}`}>{category?.label}</a> سر بزنید.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+          {similar.map((b) => <a class="bg-surface-container rounded-xl border border-surface-variant p-4 hover:border-primary/50 transition-colors flex items-center justify-between gap-2" href={`/business/${b.slug}`}><span><span class="block text-on-surface font-label-md">{b.name}</span><span class="block text-xs text-on-surface-variant mt-1">{faRating(b.rating)} · {fa(b.reviews)} نظر</span></span><Icon class="text-outline" icon="chevron_left" /></a>)}
+        </div>
+      </section>
+    )
+  }
+</PageLayout>

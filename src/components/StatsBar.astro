@@ -13,7 +13,7 @@ import { stats } from '../data/site';
         <>
           {i > 0 && <div class="w-px h-12 bg-surface-variant hidden md:block" />}
           <div class="flex flex-col items-center text-center">
-            <span class="font-headline-lg text-headline-lg text-primary">
+            <span class="font-headline-lg text-headline-lg text-primary" data-countup data-final={stat.value}>
               {stat.value}
             </span>
             <span class="font-label-md text-label-md text-on-surface-variant">
@@ -25,3 +25,42 @@ import { stats } from '../data/site';
     }
   </div>
 </section>
+
+<script>
+  // Count-up for the stats bar, once, when it scrolls into view.
+  // Persian digits preserved; a trailing "+" is kept from the final string.
+  const FA = '۰۱۲۳۴۵۶۷۸۹';
+  const toFa = (n: number) => String(n).replace(/\d/g, (d) => FA[+d]);
+  const fromFa = (s: string) => s.replace(/[۰-۹]/g, (d) => String(FA.indexOf(d)));
+
+  const els = [...document.querySelectorAll<HTMLElement>('[data-countup]')];
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          io.unobserve(entry.target);
+          animate(entry.target as HTMLElement);
+        }
+      },
+      { once: true } as IntersectionObserverInit,
+    );
+    els.forEach((el) => io.observe(el));
+  }
+
+  function animate(el: HTMLElement) {
+    const final = el.dataset.final ?? '';
+    const plus = final.endsWith('+') ? '+' : '';
+    const target = parseInt(fromFa(final), 10);
+    if (!Number.isFinite(target)) return;
+    const dur = 1200;
+    const t0 = performance.now();
+    function frame(now: number) {
+      const p = Math.min((now - t0) / dur, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = toFa(Math.round(target * eased)) + plus;
+      if (p < 1) requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+</script>

@@ -1,0 +1,40 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../data/site';
+import { businesses, fa } from '../data/businesses';
+---
+
+<PageLayout
+  description={`درباره ${site.nameFa}: مرجع تخصصی معرفی بهترین کسب‌وکارهای ایران با بررسی‌های دقیق و میدانی.`}
+  heading={`درباره ${site.nameFa}`}
+  subheading={site.description}
+  title="درباره ما"
+>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-md mb-xl">
+    <div class="bg-surface-container rounded-2xl border border-surface-variant p-md">
+      <Icon class="text-3xl text-primary mb-3" icon="public" />
+      <h2 class="font-headline-md text-lg text-on-surface mb-2">ماموریت ما</h2>
+      <p class="text-sm text-on-surface-variant leading-relaxed">
+        ساختن معتبرترین مرجع «بهترین‌ها» در ایران؛ جایی که مصرف‌کننده بدون
+        وابستگی به تبلیغات، تصمیم بگیرد و کسب‌وکارهای باکیفیت، همان‌طور که باید دیده شوند.
+      </p>
+    </div>
+    <div class="bg-surface-container rounded-2xl border border-surface-variant p-md">
+      <Icon class="text-3xl text-secondary mb-3" icon="diversity_3" />
+      <h2 class="font-headline-md text-lg text-on-surface mb-2">تیم ما</h2>
+      <p class="text-sm text-on-surface-variant leading-relaxed">
+        شبکه‌ای از ارزیابان میدانی در سراسر کشور، تحلیلگران داده و تیم تحریریه
+        که روزانه {fa(businesses.length * 100)}+ داده را پردازش می‌کنند.
+      </p>
+    </div>
+    <div class="bg-surface-container rounded-2xl border border-surface-variant p-md">
+      <Icon class="text-3xl text-tertiary-fixed mb-3" icon="workspace_premium" />
+      <h2 class="font-headline-md text-lg text-on-surface mb-2">قول ما به شما</h2>
+      <p class="text-sm text-on-surface-variant leading-relaxed">
+        رتبه‌ها خریدنی نیستند. هیچ کسب‌کاری با پرداخت هزینه جای بهتری نمی‌گیرد
+        و روش ارزیابی ما کاملاً <a class="text-primary underline" href="/methodology">شفاف و منتشرشده</a> است.
+      </p>
+    </div>
+  </div>
+</PageLayout>

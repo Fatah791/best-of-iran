@@ -1,0 +1,51 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import { site } from '../data/site';
+---
+
+<PageLayout
+  description="قوانین و مقررات استفاده از بست آف ایران."
+  heading="قوانین و مقررات"
+  subheading="استفاده از محتوای بست آف ایران مشمول شرایط زیر است."
+  title="قوانین"
+>
+  <div class="max-w-3xl space-y-md text-on-surface-variant leading-relaxed">
+    <section class="bg-surface-container rounded-2xl border border-surface-variant p-md">
+      <h2 class="font-headline-md text-lg text-on-surface mb-2">محتوا و مالکیت</h2>
+      <p class="text-sm">
+        تمام مقالات، رتبه‌بندی‌ها و تصاویر متعلق به {site.nameFa} است. بازنشر
+        تا ۳۰۰ کاراکتر با ذکر منبع و لینک فعال به صفحه اصلی بلامانع است؛
+        بازنشر کامل بدون اجازه کتبی ممنوع است.
+      </p>
+    </section>
+
+    <section class="bg-surface-container rounded-2xl border border-surface-variant p-md">
+      <h2 class="font-headline-md text-lg text-on-surface mb-2">ماهیت ارزیابی‌ها</h2>
+      <p class="text-sm">
+        امتیاز و رتبه‌ها بر پایه بازدید میدانی و تحلیل نظرات در زمان انتشار است
+        و «تضمین کیفیت مطلق» نیست. ما هیچ‌گونه مبلغی بابت ارتقای رتبه دریافت
+        نمی‌کنیم و مسئولیت رفتار آتی کسب‌وکارها مستقیماً با خود آن‌هاست.
+      </p>
+    </section>
+
+    <section class="bg-surface-container rounded-2xl border border-surface-variant p-md">
+      <h2 class="font-headline-md text-lg text-on-surface mb-2">ثبت کسب‌وکار</h2>
+      <p class="text-sm">
+        ثبت‌نام رایگان به معنای تایید خودکار نیست. هر درخواست پس از بررسی
+        اولیه و در صورت احراز، وارد صف ارزیابی میدانی می‌شود. ارائه اطلاعات
+        نادرست، رد یا حذف پروفایل را در پی دارد.
+      </p>
+    </section>
+
+    <section class="bg-surface-container rounded-2xl border border-surface-variant p-md">
+      <h2 class="font-headline-md text-lg text-on-surface mb-2">حریم خصوصی</h2>
+      <p class="text-sm">
+        ایمیل خبرنامه و اطلاعات تماس فرم‌ها تنها برای ارتباط درباره همان درخواست
+        استفاده می‌شود و در اختیار شخص ثالث قرار نمی‌گیرد. تحلیل ترافیک بدون
+        کوکی‌های ردیابی هویتی (Vercel Analytics) انجام می‌شود.
+      </p>
+    </section>
+
+    <p class="text-xs text-on-surface-variant/70">آخرین به‌روزرسانی: شهریور ۱۴۰۵</p>
+  </div>
+</PageLayout>

@@ -1,0 +1,70 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import PlaceCard from '../../components/PlaceCard.astro';
+import Icon from '../../components/Icon.astro';
+import { cities, categories } from '../../data/site';
+import { byCity, fa } from '../../data/businesses';
+
+export function getStaticPaths() {
+  return cities.map((city) => ({ params: { slug: city.slug }, props: { city } }));
+}
+
+const { city } = Astro.props;
+const list = byCity(city.slug);
+const catsWithItems = categories.filter((c) => list.some((b) => b.category === c.slug));
+---
+
+<PageLayout
+  description={`بهترین کسب‌وکارهای ${city.label} — بررسی میدانی و رتبه‌بندی بست آف ایران.`}
+  heading={`بهترین‌های ${city.label}`}
+  subheading={`${fa(list.length)} کسب‌وکار برتر ${city.label} که تیم ما میدانی بررسی کرده است.`}
+  title={`شهر ${city.label}`}
+>
+  <div slot="actions">
+    <nav class="flex flex-wrap gap-2 mt-2">
+      <a
+        class="px-4 py-2 rounded-full border font-label-md text-label-md transition-colors bg-primary text-on-primary border-primary"
+        href="#all"
+      >
+        همه
+      </a>
+      {
+        catsWithItems.map((c) => (
+          <a
+            class="px-4 py-2 rounded-full border border-outline-variant text-on-surface-variant hover:text-primary hover:border-primary font-label-md text-label-md transition-colors"
+            href={`/categories/${c.slug}?city=${city.slug}`}
+          >
+            {c.label}
+            <Icon class="text-xs mr-1" icon="arrow_back" />
+          </a>
+        ))
+      }
+    </nav>
+  </div>
+
+  <div class="space-y-md" id="all">
+    {
+      list.length > 0 ? (
+        list.map((b) => <PlaceCard business={b} compact />)
+      ) : (
+        <div class="bg-surface-container rounded-2xl border border-dashed border-outline-variant p-lg text-center">
+          <Icon class="text-4xl text-outline mx-auto mb-3" icon="search" />
+          <h3 class="font-headline-md text-lg text-on-surface mb-2">
+            هنوز بررسی‌ها در این شهر آغاز نشده
+          </h3>
+          <p class="text-on-surface-variant text-sm mb-6">
+            فهرست کسب‌وکارهای {city.label} در حال تکمیل است. اگر صاحب کسب‌وکاری،
+            همین حالا درخواست بررسی بده.
+          </p>
+          <a
+            class="inline-flex items-center gap-2 bg-primary text-on-primary px-6 py-3 rounded-xl font-label-md hover:brightness-110 transition-all"
+            href="/register"
+          >
+            <Icon icon="add_business" />
+            ثبت کسب‌وکار در {city.label}
+          </a>
+        </div>
+      )
+    }
+  </div>
+</PageLayout>

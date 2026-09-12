@@ -2,7 +2,9 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ArticleLayout from '../../layouts/ArticleLayout.astro';
 import ArticleBlocks from '../../components/ArticleBlocks.astro';
+import JsonLd from '../../components/JsonLd.astro';
 import { getAllArticles, type FullArticle } from '../../data/articles';
+import { site } from '../../data/site';
 
 export function getStaticPaths() {
   return getAllArticles().map((article) => ({
@@ -12,9 +14,53 @@ export function getStaticPaths() {
 }
 
 const { article } = Astro.props as { article: FullArticle };
+const url = new URL(Astro.url.pathname, Astro.site).href;
+
+const faqBlock = article.blocks.find((b) => b.type === 'faq');
+const ld = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: article.title,
+    description: article.description,
+    inLanguage: 'fa',
+    author: { '@type': 'Organization', name: article.author },
+    publisher: { '@type': 'Organization', name: site.name },
+    datePublished: '2026-09-01',
+    dateModified: '2026-09-12',
+    mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'خانه', item: site.url },
+      ...article.breadcrumb.slice(1).map((c, i) => ({
+        '@type': 'ListItem',
+        position: i + 2,
+        name: c.label,
+        ...(c.href !== '#' ? { item: new URL(c.href, Astro.site).href } : {}),
+      })),
+    ],
+  },
+  ...(faqBlock?.type === 'faq'
+    ? [
+        {
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          mainEntity: faqBlock.items.map((f) => ({
+            '@type': 'Question',
+            name: f.q,
+            acceptedAnswer: { '@type': 'Answer', text: f.a },
+          })),
+        },
+      ]
+    : []),
+];
 ---
 
 <BaseLayout description={article.description} title={article.title}>
+  <JsonLd data={ld} slot="head" />
   <ArticleLayout article={article}>
     {article.blocks.map((block) => <ArticleBlocks block={block} />)}
   </ArticleLayout>

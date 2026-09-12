@@ -1,0 +1,122 @@
+---
+import Icon from './Icon.astro';
+import { fa, faRating, type Business } from '../data/businesses';
+import { cities, categories } from '../data/site';
+
+interface Props {
+  business: Business;
+  /** hides the category/city chips when the page context already shows them */
+  compact?: boolean;
+}
+
+const { business, compact = false } = Astro.props;
+const city = cities.find((c) => c.slug === business.city);
+const category = categories.find((c) => c.slug === business.category);
+---
+
+<article
+  class="group bg-surface-container rounded-2xl border border-surface-variant hover:border-primary/40 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/5 transition-all overflow-hidden"
+  data-city={business.city}
+  data-name={business.name}
+  data-rating={business.rating}
+  data-reveal
+>
+  <div class="grid grid-cols-1 sm:grid-cols-5">
+    <div class="sm:col-span-2 relative bg-surface-variant min-h-40">
+      {
+        business.image ? (
+          <img
+            alt={business.name}
+            class="w-full h-full object-cover"
+            loading="lazy"
+            src={business.image}
+          />
+        ) : (
+          <div class="skeleton absolute inset-0" role="img" aria-label={`تصویر ${business.name}`}></div>
+        )
+      }
+      {
+        business.verified && (
+          <span class="absolute top-sm right-sm bg-primary text-on-primary px-2 py-1 rounded-md text-xs font-bold flex items-center gap-1">
+            <Icon class="text-sm" icon="verified" />
+            تایید شده
+          </span>
+        )
+      }
+    </div>
+
+    <div class="sm:col-span-3 p-md flex flex-col">
+      <div class="flex items-start justify-between gap-2">
+        <div>
+          <h3 class="font-headline-md text-lg text-on-surface mb-1">
+            <a class="hover:text-primary transition-colors" href={`/business/${business.slug}`}>
+              {business.name}
+            </a>
+          </h3>
+          <p class="text-sm text-on-surface-variant mb-2">{business.tagline}</p>
+        </div>
+        <span class="flex items-center gap-1 text-primary font-bold text-sm shrink-0 bg-primary/10 px-2 py-1 rounded-lg">
+          <Icon class="text-base" icon="starFilled" />
+          {faRating(business.rating)}
+        </span>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3 text-xs text-on-surface-variant">
+        <span class="flex items-center gap-1">
+          <Icon class="text-sm" icon="location_on" />
+          {fa(business.reviews)} نظر
+        </span>
+        <span class="flex items-center gap-1">
+          <Icon class="text-sm" icon="payments" />
+          {business.priceTier}
+        </span>
+        {
+          !compact && city && (
+            <a class="flex items-center gap-1 hover:text-primary" href={`/cities/${city.slug}`}>
+              <Icon class="text-sm" icon="my_location" />
+              {city.label}
+            </a>
+          )
+        }
+        {
+          !compact && category && (
+            <a class="flex items-center gap-1 hover:text-primary" href={`/categories/${category.slug}`}>
+              <Icon class="text-sm" icon="category" />
+              {category.label}
+            </a>
+          )
+        }
+      </div>
+
+      <div class="flex flex-wrap gap-1 mt-3">
+        {
+          business.tags.map((tag) => (
+            <span class="bg-surface-variant/60 text-on-surface-variant px-2 py-0.5 rounded text-[11px]">
+              {tag}
+            </span>
+          ))
+        }
+      </div>
+
+      <div class="flex items-center gap-2 mt-auto pt-4">
+        <a
+          class="flex-1 sm:flex-none text-center bg-primary-container text-on-primary-container px-4 py-2 rounded-lg font-label-md text-label-md hover:brightness-110 transition-all"
+          href={`/business/${business.slug}`}
+        >
+          مشاهده پروفایل
+        </a>
+        {
+          business.phone && (
+            <a
+              class="flex items-center justify-center gap-1 border border-outline-variant text-on-surface px-4 py-2 rounded-lg font-label-md text-label-md hover:bg-surface-container transition-colors"
+              href={`tel:${business.phone}`}
+            >
+              <Icon class="text-sm" icon="call" />
+              تماس
+            </a>
+          )
+        }
+      </div>
+    </div>
+  </div>
+</article>

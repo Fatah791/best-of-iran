@@ -1,0 +1,43 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import Icon from '../../components/Icon.astro';
+import { cities } from '../../data/site';
+import { businesses, fa } from '../../data/businesses';
+---
+
+<PageLayout
+  description="کاوش بهترین کسب‌وکارها در شهرهای بزرگ ایران."
+  heading="شهرهای ایران"
+  subheading="بهترین کسب‌وکارهای هر شهر را بر اساس بررسی‌های میدانی ما کاوش کنید."
+  title="شهرها"
+>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-md">
+    {
+      cities.map((city) => {
+        const count = businesses.filter((b) => b.city === city.slug).length;
+        return (
+          <a
+            class="group bg-surface-container rounded-2xl border border-surface-variant hover:border-primary/50 hover:-translate-y-0.5 transition-all p-md flex items-center justify-between"
+            data-reveal=""
+            href={`/cities/${city.slug}`}
+          >
+            <span class="flex items-center gap-3">
+              <span class="w-12 h-12 rounded-full bg-primary-container/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Icon class="text-2xl text-primary" icon="my_location" />
+              </span>
+              <span>
+                <span class="block font-headline-md text-lg text-on-surface group-hover:text-primary transition-colors">
+                  {city.label}
+                </span>
+                <span class="block text-xs text-on-surface-variant">
+                  {fa(count)} کسب‌وکار ثبت‌شده
+                </span>
+              </span>
+            </span>
+            <Icon class="text-outline rotate-180" icon="arrow_back" />
+          </a>
+        );
+      })
+    }
+  </div>
+</PageLayout>

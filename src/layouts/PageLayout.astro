@@ -1,0 +1,42 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import TopNavBar from '../components/TopNavBar.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import { site } from '../data/site';
+
+/** Standard interior-page shell: nav, page heading band, content, footer. */
+interface Props {
+  title: string;
+  description?: string;
+  heading: string;
+  subheading?: string;
+}
+
+const { title, description, heading, subheading } = Astro.props;
+---
+
+<BaseLayout description={description} title={`${title} | ${site.nameFa}`}>
+  <slot name="head" slot="head" />
+
+  <TopNavBar />
+
+  <main class="flex-grow w-full" id="main">
+    <div class="max-w-screen-2xl mx-auto px-margin-mobile md:px-margin-desktop py-lg">
+      <header class="mb-lg">
+        <h1 class="font-headline-xl text-headline-xl text-on-surface mb-2">{heading}</h1>
+        {
+          subheading && (
+            <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+              {subheading}
+            </p>
+          )
+        }
+        <slot name="actions" />
+      </header>
+
+      <slot />
+    </div>
+  </main>
+
+  <SiteFooter />
+</BaseLayout>

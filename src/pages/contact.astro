@@ -1,0 +1,44 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../data/site';
+---
+
+<PageLayout
+  description="با تیم بست آف ایران در تماس باشید: پیشنهاد، گزارش خطا و همکاری."
+  heading="تماس با ما"
+  subheading="پیشنهاد، انتقاد یا گزارش خطا در ارزیابی‌ها را برای ما بفرستید."
+  title="تماس با ما"
+>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+    <a
+      class="bg-surface-container rounded-2xl border border-surface-variant p-md text-center hover:border-primary/50 transition-colors"
+      href="mailto:info@best-of-iran.app"
+    >
+      <Icon class="text-3xl text-primary mx-auto mb-3" icon="alternate_email" />
+      <h2 class="font-label-md text-label-md text-on-surface">ایمیل</h2>
+      <p class="text-sm text-on-surface-variant mt-1" dir="ltr">info@best-of-iran.app</p>
+    </a>
+    <a
+      class="bg-surface-container rounded-2xl border border-surface-variant p-md text-center hover:border-primary/50 transition-colors"
+      href={site.telegramUrl}
+      rel="noopener noreferrer"
+      target="_blank"
+    >
+      <Icon class="text-3xl text-primary mx-auto mb-3" icon="send" />
+      <h2 class="font-label-md text-label-md text-on-surface">تلگرام</h2>
+      <p class="text-sm text-on-surface-variant mt-1">کانال و پیام مستقیم</p>
+    </a>
+    <div class="bg-surface-container rounded-2xl border border-surface-variant p-md text-center">
+      <Icon class="text-3xl text-primary mx-auto mb-3" icon="schedule" />
+      <h2 class="font-label-md text-label-md text-on-surface">پاسخ‌گویی</h2>
+      <p class="text-sm text-on-surface-variant mt-1">شنبه تا چهارشنبه، ۹ تا ۱۷</p>
+    </div>
+  </div>
+
+  <p class="text-sm text-on-surface-variant mt-lg text-center">
+    برای ثبت کسب‌وکار به صفحه
+    <a class="text-primary underline" href="/register">ثبت کسب‌وکار</a>
+    مراجعه کنید — فرم تماس جایگزین آن نیست.
+  </p>
+</PageLayout>

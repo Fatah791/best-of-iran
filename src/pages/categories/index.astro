@@ -1,0 +1,50 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import Icon from '../../components/Icon.astro';
+import { directoryCategories, cities } from '../../data/site';
+import { businesses, fa } from '../../data/businesses';
+---
+
+<PageLayout
+  description="دسته‌بندی‌های کسب‌وکارها: رستوران، هتل، کارواش، پزشکی و بیشتر — با رتبه‌بندی بست آف ایران."
+  heading="دسته‌بندی‌ها"
+  subheading="بر اساس آنچه مردم بیشترین جستجو را درباره‌اش دارند."
+  title="دسته‌بندی‌ها"
+>
+  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-md">
+    {
+      directoryCategories.map((cat) => {
+        const count = businesses.filter((b) => b.category === cat.slug).length;
+        return (
+          <a
+            class="group flex flex-col items-center text-center p-lg bg-surface-container rounded-2xl border border-surface-variant hover:border-primary/50 hover:-translate-y-0.5 transition-all"
+            data-reveal=""
+            href={`/categories/${cat.slug}`}
+          >
+            <span class="w-16 h-16 rounded-full bg-primary-container/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+              <Icon class="text-3xl text-primary" icon={cat.icon} />
+            </span>
+            <span class="font-label-md text-label-md text-on-surface">{cat.label}</span>
+            <span class="text-xs text-on-surface-variant mt-1">{fa(count)} مورد</span>
+          </a>
+        );
+      })
+    }
+  </div>
+
+  <h2 class="font-headline-md text-headline-md text-on-surface mt-xl mb-md">
+    شهرهای ما
+  </h2>
+  <div class="flex flex-wrap gap-3">
+    {
+      cities.map((c) => (
+        <a
+          class="px-5 py-2 rounded-full bg-surface-container border border-outline-variant hover:border-primary hover:text-primary text-on-surface font-label-md text-label-md transition-all"
+          href={`/cities/${c.slug}`}
+        >
+          {c.label}
+        </a>
+      ))
+    }
+  </div>
+</PageLayout>

@@ -1,0 +1,35 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import PlaceCard from '../components/PlaceCard.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../data/site';
+import { topTrending, fa } from '../data/businesses';
+
+const list = topTrending(12);
+---
+
+<PageLayout
+  description="کسب‌وکارهایی که این هفته بیشترین تماس و رزرو را در بست آف ایران داشته‌اند."
+  heading="پربازدیدترین‌های هفته"
+  subheading="بر اساس تماس‌ها و رزروهای ثبت‌شده — به‌روزرسانی هر شنبه."
+  title="پربازدیدترین‌ها"
+>
+  <div class="space-y-md">
+    {
+      list.map((b, i) => (
+        <div class="flex items-start gap-3">
+          <span class="flex-shrink-0 w-9 h-9 rounded-full bg-surface-container border border-surface-variant flex items-center justify-center font-bold text-primary mt-4">{fa(i + 1)}</span>
+          <div class="flex-grow">
+            <PlaceCard business={b} />
+          </div>
+        </div>
+      ))
+    }
+  </div>
+
+  <div class="mt-xl bg-surface-container rounded-2xl border border-surface-variant p-md flex items-center gap-2 justify-center text-sm text-on-surface-variant">
+    <Icon class="text-primary" icon="lock_clock" />
+    رتبه‌ها با فرمول شفاف متدولوژی محاسبه می‌شوند —
+    <a class="text-primary hover:underline" href="/methodology">بخوانید</a>
+  </div>
+</PageLayout>
