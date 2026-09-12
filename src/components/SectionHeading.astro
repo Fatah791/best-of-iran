@@ -1,0 +1,19 @@
+---
+interface Props {
+  title: string;
+  subtitle?: string;
+  align?: 'center' | 'start';
+}
+
+const { title, subtitle, align = 'center' } = Astro.props;
+---
+
+<div class:list={['mb-8', { 'text-center': align === 'center' }]}>
+  <h2 class="font-headline-md text-headline-md text-on-surface mb-2">
+    {title}
+  </h2>
+  {subtitle && (
+    <p class="font-body-md text-body-md text-on-surface-variant">{subtitle}</p>
+  )}
+  <slot name="action" />
+</div>

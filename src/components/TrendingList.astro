@@ -1,0 +1,90 @@
+---
+import Icon from './Icon.astro';
+import { trendingThisWeek } from '../data/content';
+
+const persianDigits = (n: number) =>
+  String(n).replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[Number(d)]);
+---
+
+<section class="py-16 bg-surface-container-low px-margin-mobile md:px-margin-desktop">
+  <div class="max-w-screen-2xl mx-auto w-full">
+    <div class="flex items-center gap-3 mb-8">
+      <Icon class="text-3xl text-tertiary-fixed" icon="trending_up" />
+      <div>
+        <h2 class="font-headline-md text-headline-md text-on-surface">
+          پربازدیدترین‌های هفته
+        </h2>
+        <p class="font-body-md text-body-md text-on-surface-variant">
+          کسب‌وکارهایی که بیشترین تماس و رزرو را داشته‌اند.
+        </p>
+      </div>
+    </div>
+
+    <div class="bg-surface rounded-2xl border border-surface-variant overflow-hidden">
+      <div class="divide-y divide-surface-variant">
+        {
+          trendingThisWeek.map((business) => (
+            <div class="p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 hover:bg-surface-container-lowest transition-colors">
+              <div
+                class:list={[
+                  'flex-shrink-0 w-12 h-12 rounded-full bg-surface-container flex items-center justify-center font-bold text-lg',
+                  business.rank === 1 ? 'text-primary' : 'text-on-surface-variant',
+                ]}
+              >
+                {persianDigits(business.rank)}
+              </div>
+
+              <div class="flex-grow">
+                <div class="flex items-center gap-2 mb-1">
+                  <h3 class="font-headline-md text-lg text-on-surface">
+                    {business.name}
+                  </h3>
+                  {business.verified && (
+                    <Icon
+                      class="text-tertiary-fixed text-sm"
+                      icon="verified"
+                      title="تایید شده"
+                    />
+                  )}
+                </div>
+                <div class="flex flex-wrap items-center gap-3 text-sm text-on-surface-variant">
+                  <span class="flex items-center gap-1">
+                    <Icon class="text-sm" icon={business.typeIcon} />
+                    {business.typeLabel}
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <Icon class="text-sm" icon="location_on" />
+                    {business.location}
+                  </span>
+                  <span class="flex items-center gap-1 text-primary">
+                    <Icon class="text-sm" icon="star" />
+                    {business.rating} ({business.reviews} نظر)
+                  </span>
+                </div>
+              </div>
+
+              <button
+                class:list={[
+                  'w-full sm:w-auto mt-3 sm:mt-0 px-6 py-2 rounded-lg font-label-md flex items-center justify-center gap-2',
+                  business.action === 'call'
+                    ? 'bg-primary-container text-on-primary-container hover:brightness-110'
+                    : 'border border-outline-variant text-on-surface hover:bg-surface-container',
+                ]}
+                type="button"
+              >
+                <Icon class="text-sm" icon={business.action === 'call' ? 'call' : 'visibility'} />
+                {business.action === 'call' ? 'تماس' : 'مشاهده'}
+              </button>
+            </div>
+          ))
+        }
+      </div>
+
+      <div class="p-4 bg-surface-container-lowest text-center border-t border-surface-variant">
+        <a class="text-primary font-label-md hover:underline" href="/trending">
+          مشاهده لیست کامل پربازدیدها
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

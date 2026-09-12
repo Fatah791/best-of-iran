@@ -1,0 +1,62 @@
+---
+import { primaryNav, site } from '../data/site';
+
+const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isActive = (href: string) => href === currentPath;
+---
+
+<header
+  class="bg-surface border-b border-surface-variant sticky top-0 z-50 w-full"
+>
+  <div
+    class="flex flex-row-reverse justify-between items-center w-full px-margin-desktop py-base max-w-screen-2xl mx-auto"
+  >
+    <!-- Brand -->
+    <a
+      href="/"
+      class="font-headline-lg text-headline-lg font-bold text-primary shrink-0"
+    >
+      {site.name}
+    </a>
+
+    <!-- Navigation Links (Desktop) -->
+    <nav class="hidden md:flex gap-gutter items-center">
+      {
+        primaryNav.map((item) => (
+          <a
+            href={item.href}
+            class:list={[
+              'text-on-surface-variant hover:text-primary transition-colors duration-200 font-label-md text-label-md hover:brightness-110',
+              { 'text-primary': isActive(item.href) },
+            ]}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <!-- Search Bar -->
+    <div
+      class="hidden lg:flex items-center bg-surface-container rounded-full px-sm py-xs border border-outline-variant focus-within:border-primary-container transition-colors"
+    >
+      <span class="material-symbols-outlined text-on-surface-variant ml-xs"
+        >search</span
+      >
+      <input
+        aria-label="جستجو در کسب‌وکارها"
+        class="bg-transparent border-none outline-none text-body-md text-on-surface placeholder-on-surface-variant w-48"
+        placeholder="جستجو در کسب‌وکارها..."
+        type="search"
+      />
+    </div>
+
+    <!-- Primary Action -->
+    <button
+      class="bg-primary-container text-on-primary-container px-md py-sm rounded-lg font-label-md text-label-md hover:brightness-110 transition-all shrink-0"
+      type="button"
+    >
+      ورود / عضویت
+    </button>
+  </div>
+</header>

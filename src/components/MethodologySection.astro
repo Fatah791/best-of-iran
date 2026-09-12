@@ -1,0 +1,64 @@
+---
+import Icon from './Icon.astro';
+import { methodology } from '../data/site';
+---
+
+<section class="py-16 px-margin-mobile md:px-margin-desktop max-w-screen-2xl mx-auto w-full">
+  <div class="flex flex-col lg:flex-row gap-12 items-center">
+    <!-- Copy + checklist -->
+    <div class="lg:w-1/2 space-y-6">
+      <h2 class="font-headline-xl text-3xl md:text-4xl text-on-surface">
+        {methodology.title}
+      </h2>
+      <p class="text-on-surface-variant leading-relaxed">{methodology.intro}</p>
+
+      <ul class="space-y-4 mt-6">
+        {
+          methodology.points.map((point) => (
+            <li class="flex items-start gap-3">
+              <div class="mt-1 w-8 h-8 rounded-full bg-tertiary-container/20 flex items-center justify-center flex-shrink-0">
+                <Icon class="text-tertiary-fixed text-sm" icon={point.icon} />
+              </div>
+              <div>
+                <h4 class="font-headline-md text-base text-on-surface">
+                  {point.title}
+                </h4>
+                <p class="text-sm text-on-surface-variant mt-1">{point.body}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="pt-4">
+        <a
+          class="inline-flex items-center gap-2 text-primary border-b border-primary pb-1 hover:text-primary-fixed transition-colors font-label-md"
+          href="/methodology"
+        >
+          مطالعه کامل متدولوژی ما
+          <Icon class="text-sm" icon="arrow_back" />
+        </a>
+      </div>
+    </div>
+
+    <!-- Criteria cards -->
+    <div class="lg:w-1/2 w-full grid grid-cols-2 gap-4">
+      {
+        methodology.criteria.map((criterion, i) => (
+          <div
+            class:list={[
+              'bg-surface-container rounded-2xl p-6 flex flex-col items-center text-center justify-center h-48 border border-surface-variant',
+              i === 1 && 'md:mt-8',
+              i === 2 && 'md:-mt-8',
+            ]}
+          >
+            <Icon class:list={['text-4xl mb-3', criterion.tone]} icon={criterion.icon} />
+            <h5 class="font-headline-md text-lg text-on-surface">
+              {criterion.label}
+            </h5>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>

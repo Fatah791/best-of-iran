@@ -1,0 +1,19 @@
+---
+import { mobileDock } from '../data/site';
+---
+
+<nav
+  class="bg-surface-container-highest border-t border-outline-variant fixed bottom-0 w-full rounded-t-xl z-50 md:hidden flex justify-around items-center h-16 px-margin-mobile shadow-lg"
+>
+  {
+    mobileDock.map((item) => (
+      <a
+        class="flex flex-col items-center justify-center text-on-surface px-4 py-2 hover:bg-primary-container"
+        href={item.href}
+      >
+        <span class="material-symbols-outlined mb-1 text-2xl">{item.icon}</span>
+        <span class="font-label-sm text-label-sm">{item.label}</span>
+      </a>
+    ))
+  }
+</nav>

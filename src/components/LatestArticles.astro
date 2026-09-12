@@ -1,0 +1,38 @@
+---
+import ArticleCard from './ArticleCard.astro';
+import Icon from './Icon.astro';
+import { latestArticles } from '../data/content';
+---
+
+<section class="py-16 px-margin-mobile md:px-margin-desktop max-w-screen-2xl mx-auto w-full">
+  <div class="flex justify-between items-end mb-8">
+    <div>
+      <h2 class="font-headline-md text-headline-md text-on-surface mb-2">
+        جدیدترین بررسی‌ها
+      </h2>
+      <p class="font-body-md text-body-md text-on-surface-variant">
+        مقالات و بررسی‌های تخصصی تیم ما.
+      </p>
+    </div>
+    <a
+      class="hidden md:flex items-center gap-1 text-primary font-label-md hover:underline"
+      href="/articles"
+    >
+      مشاهده همه
+      <Icon class="text-sm" icon="arrow_back" />
+    </a>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {latestArticles.map((article) => <ArticleCard article={article} />)}
+  </div>
+
+  <div class="mt-6 text-center md:hidden">
+    <a
+      class="inline-flex items-center gap-2 text-primary border border-primary px-6 py-2 rounded-full font-label-md"
+      href="/articles"
+    >
+      مشاهده همه مقالات
+    </a>
+  </div>
+</section>

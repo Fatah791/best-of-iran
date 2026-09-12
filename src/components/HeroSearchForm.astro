@@ -1,0 +1,53 @@
+---
+import Icon from './Icon.astro';
+import { searchCategories, searchCities } from '../data/site';
+
+/**
+ * Hero search submits to a real /search route with query params
+ * (no more dead `#` links).
+ */
+---
+
+<div class="w-full mt-lg">
+  <form
+    action="/search"
+    class="bg-surface p-sm rounded-xl border border-surface-variant shadow-lg flex flex-col md:flex-row gap-sm items-stretch"
+    method="get"
+  >
+    <label
+      class="flex-1 flex items-center bg-surface-container rounded-lg px-sm border border-outline-variant focus-within:border-primary-container transition-colors"
+    >
+      <Icon class="text-on-surface-variant ml-xs text-[20px]" icon="location_on" />
+      <span class="sr-only">انتخاب شهر</span>
+      <select
+        class="w-full bg-transparent border-none text-body-md text-on-surface p-sm outline-none appearance-none"
+        name="city"
+      >
+        <option selected value="">انتخاب شهر</option>
+        {searchCities.map((city) => <option value={city.slug}>{city.label}</option>)}
+      </select>
+    </label>
+
+    <label
+      class="flex-1 flex items-center bg-surface-container rounded-lg px-sm border border-outline-variant focus-within:border-primary-container transition-colors"
+    >
+      <Icon class="text-on-surface-variant ml-xs text-[20px]" icon="category" />
+      <span class="sr-only">انتخاب دسته‌بندی</span>
+      <select
+        class="w-full bg-transparent border-none text-body-md text-on-surface p-sm outline-none appearance-none"
+        name="category"
+      >
+        <option selected value="">انتخاب دسته‌بندی</option>
+        {searchCategories.map((cat) => <option value={cat.slug}>{cat.label}</option>)}
+      </select>
+    </label>
+
+    <button
+      class="bg-primary-container text-on-primary-container px-xl py-sm rounded-lg font-label-md text-label-md hover:brightness-110 transition-all flex items-center justify-center gap-xs"
+      type="submit"
+    >
+      <Icon class="text-[20px]" icon="search" />
+      جستجو
+    </button>
+  </form>
+</div>

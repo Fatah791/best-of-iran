@@ -1,0 +1,48 @@
+---
+import { site, footerLinks } from '../data/site';
+
+const year = '۲۰۲۴';
+---
+
+<footer class="bg-surface-container border-t border-surface-variant w-full mt-auto">
+  <div
+    class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-gutter px-margin-desktop py-xl w-full text-right max-w-screen-2xl mx-auto"
+  >
+    <div class="col-span-2 md:col-span-4 lg:col-span-2 mb-md lg:mb-0">
+      <h3 class="font-headline-lg text-headline-lg font-bold text-primary mb-sm">
+        {site.name}
+      </h3>
+      <p class="font-body-md text-body-md text-on-surface-variant">
+        {site.description}
+      </p>
+    </div>
+
+    {
+      footerLinks.map((group) => (
+        <div>
+          <h4 class="font-label-md text-label-md text-on-surface mb-sm">
+            {group.title}
+          </h4>
+          <ul class="space-y-xs">
+            {group.links.map((link) => (
+              <li>
+                <a
+                  class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary underline transition-all"
+                  href={link.href}
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
+  </div>
+
+  <div class="text-center py-md border-t border-surface-variant mt-md">
+    <span class="font-label-sm text-label-sm text-on-surface-variant">
+      © {year} {site.nameFa}. تمامی حقوق محفوظ است.
+    </span>
+  </div>
+</footer>

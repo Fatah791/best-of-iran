@@ -1,0 +1,27 @@
+---
+import { stats } from '../data/site';
+---
+
+<section
+  class="bg-surface-container-high py-md px-margin-mobile md:px-margin-desktop border-b border-surface-variant"
+>
+  <div
+    class="max-w-screen-2xl mx-auto flex flex-wrap justify-center md:justify-between items-center gap-md"
+  >
+    {
+      stats.map((stat, i) => (
+        <>
+          {i > 0 && <div class="w-px h-12 bg-surface-variant hidden md:block" />}
+          <div class="flex flex-col items-center text-center">
+            <span class="font-headline-lg text-headline-lg text-primary">
+              {stat.value}
+            </span>
+            <span class="font-label-md text-label-md text-on-surface-variant">
+              {stat.label}
+            </span>
+          </div>
+        </>
+      ))
+    }
+  </div>
+</section>

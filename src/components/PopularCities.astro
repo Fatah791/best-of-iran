@@ -1,0 +1,21 @@
+---
+import SectionHeading from './SectionHeading.astro';
+import { cities } from '../data/site';
+---
+
+<section class="py-16 px-margin-mobile md:px-margin-desktop max-w-screen-2xl mx-auto w-full">
+  <SectionHeading subtitle="بهترین کسب‌وکارها را در شهرهای برتر ایران پیدا کنید." title="شهرهای محبوب" />
+
+  <div class="flex flex-wrap justify-center gap-4">
+    {
+      cities.map((city) => (
+        <a
+          class="px-6 py-3 rounded-full bg-surface-container border border-outline-variant hover:border-primary text-on-surface hover:text-primary transition-all font-label-md text-label-md"
+          href={`/cities/${city.slug}`}
+        >
+          {city.label}
+        </a>
+      ))
+    }
+  </div>
+</section>

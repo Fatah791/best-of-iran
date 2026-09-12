@@ -1,0 +1,44 @@
+---
+import Icon from './Icon.astro';
+import { newsletter, site } from '../data/site';
+---
+
+<section class="py-16 px-margin-mobile md:px-margin-desktop bg-surface-container-lowest border-t border-surface-variant">
+  <div class="max-w-3xl mx-auto text-center space-y-6">
+    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-surface-variant mb-2">
+      <Icon class="text-3xl text-on-surface" icon="mark_email_read" />
+    </div>
+
+    <h2 class="font-headline-md text-2xl text-on-surface">{newsletter.title}</h2>
+    <p class="text-on-surface-variant">{newsletter.body}</p>
+
+    <div class="flex flex-col sm:flex-row gap-3 justify-center max-w-lg mx-auto mt-6">
+      <label class="flex-grow sr-only" for="newsletter-email">ایمیل</label>
+      <input
+        class="flex-grow bg-surface rounded-lg px-4 py-3 border border-outline-variant focus:border-primary-container outline-none text-on-surface text-left placeholder:text-right"
+        dir="ltr"
+        id="newsletter-email"
+        placeholder={newsletter.placeholder}
+        type="email"
+      />
+      <button class="bg-surface-variant text-on-surface px-6 py-3 rounded-lg font-label-md hover:bg-surface-container-high transition-colors" type="button">
+        {newsletter.submit}
+      </button>
+    </div>
+
+    <div class="pt-4 flex items-center justify-center gap-2 flex-wrap">
+      <span class="text-sm text-on-surface-variant">
+        یا ما را در شبکه‌های اجتماعی دنبال کنید:
+      </span>
+      <a
+        class="text-primary hover:text-primary-fixed transition-colors flex items-center gap-1 text-sm bg-primary/10 px-3 py-1 rounded-full"
+        href={site.telegramUrl}
+        rel="noopener noreferrer"
+        target="_blank"
+      >
+        کانال تلگرام
+        <Icon class="text-sm" icon="send" />
+      </a>
+    </div>
+  </div>
+</section>

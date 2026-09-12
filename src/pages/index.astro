@@ -1,0 +1,39 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TopNavBar from '../components/TopNavBar.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import MobileDock from '../components/MobileDock.astro';
+import HeroSection from '../components/HeroSection.astro';
+import HeroSearchForm from '../components/HeroSearchForm.astro';
+import StatsBar from '../components/StatsBar.astro';
+import PopularCities from '../components/PopularCities.astro';
+import CategoryGrid from '../components/CategoryGrid.astro';
+import LatestArticles from '../components/LatestArticles.astro';
+import TrendingList from '../components/TrendingList.astro';
+import MethodologySection from '../components/MethodologySection.astro';
+import OwnerCta from '../components/OwnerCta.astro';
+import NewsletterSection from '../components/NewsletterSection.astro';
+import { site } from '../data/site';
+---
+
+<BaseLayout title={`${site.name} - ${site.tagline}`}>
+  <TopNavBar />
+
+  <main class="flex-grow flex flex-col pb-20 md:pb-0">
+    <HeroSection>
+      <HeroSearchForm slot="search" />
+    </HeroSection>
+
+    <StatsBar />
+    <PopularCities />
+    <CategoryGrid />
+    <LatestArticles />
+    <TrendingList />
+    <MethodologySection />
+    <OwnerCta />
+    <NewsletterSection />
+  </main>
+
+  <MobileDock />
+  <SiteFooter />
+</BaseLayout>
