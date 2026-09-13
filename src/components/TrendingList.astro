@@ -81,7 +81,7 @@ const cityOf = (b: Business) => cities.find((c) => c.slug === b.city);
                       href={`/business/${business.slug}`}
                     >
                       <Icon class="text-sm" icon="visibility" />
-                      مشاهده
+                      مشاهده {business.name}
                     </a>
                   )
                 }

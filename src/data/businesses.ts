@@ -26,6 +26,7 @@ export interface Business {
   tags: string[];
   image?: string;
   weeklyCalls?: number;
+  review?: { author: string; when: string; text: string };
 }
 
 export const businesses: Business[] = [
@@ -48,6 +49,11 @@ export const businesses: Business[] = [
     tags: ['مواد نانو', 'سالن VIP', 'دیتیلینگ'],
     image: '/images/carwash-zayandehrood.jpg',
     weeklyCalls: 184,
+    review: {
+      author: 'علی محمدی',
+      when: '۲ روز پیش',
+      text: 'کیفیت شستشو عالی بود، فقط کمی معطلی داشت.',
+    },
   },
   {
     slug: 'nano-car-wash-isfahan',

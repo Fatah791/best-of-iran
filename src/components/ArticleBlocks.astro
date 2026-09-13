@@ -1,5 +1,6 @@
 ---
 import Icon from './Icon.astro';
+import ResponsiveImage from './ResponsiveImage.astro';
 import type { ArticleBlock } from '../data/articles';
 
 interface Props {
@@ -134,11 +135,13 @@ const rankBadge = (n: number) => faNum(n);
           <div class="grid grid-cols-1 md:grid-cols-12 gap-0">
             {biz.image && (
               <div class="md:col-span-4 h-64 md:h-auto bg-surface-variant relative">
-                <img
+                <ResponsiveImage
                   alt={biz.name}
                   class="w-full h-full object-cover"
-                  loading="lazy"
+                  eager={biz.rank === 1}
+                  sizes="(min-width: 768px) 32vw, 92vw"
                   src={biz.image}
+                  widths={[500, 900, 1200]}
                 />
                 {biz.editorPick && (
                   <div class="absolute top-sm right-sm bg-primary text-on-primary px-sm py-xs rounded-lg text-xs font-bold flex items-center gap-xs">

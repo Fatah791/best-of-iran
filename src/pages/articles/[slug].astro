@@ -5,6 +5,7 @@ import ArticleBlocks from '../../components/ArticleBlocks.astro';
 import JsonLd from '../../components/JsonLd.astro';
 import { getAllArticles, type FullArticle } from '../../data/articles';
 import { site } from '../../data/site';
+import { breadcrumbLd, faqLd } from '../../lib/schema';
 
 export function getStaticPaths() {
   return getAllArticles().map((article) => ({
@@ -26,36 +27,22 @@ const ld = [
     inLanguage: 'fa',
     author: { '@type': 'Organization', name: article.author },
     publisher: { '@type': 'Organization', name: site.name },
-    datePublished: '2026-09-01',
-    dateModified: '2026-09-12',
+    datePublished: article.isoDate,
+    dateModified: article.isoDate,
     mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+    speakable: {
+      '@type': 'SpeakableSpecification',
+      cssSelector: ['h1', '#quick-answer h2 + ul li:first-child'],
+    },
   },
-  {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'خانه', item: site.url },
-      ...article.breadcrumb.slice(1).map((c, i) => ({
-        '@type': 'ListItem',
-        position: i + 2,
-        name: c.label,
-        ...(c.href !== '#' ? { item: new URL(c.href, Astro.site).href } : {}),
-      })),
-    ],
-  },
-  ...(faqBlock?.type === 'faq'
-    ? [
-        {
-          '@context': 'https://schema.org',
-          '@type': 'FAQPage',
-          mainEntity: faqBlock.items.map((f) => ({
-            '@type': 'Question',
-            name: f.q,
-            acceptedAnswer: { '@type': 'Answer', text: f.a },
-          })),
-        },
-      ]
-    : []),
+  breadcrumbLd([
+    { label: 'مقالات', href: '/articles' },
+    ...article.breadcrumb.slice(1).map((c) => ({
+      label: c.label,
+      href: c.href === '#' ? undefined : c.href,
+    })),
+  ]),
+  ...(faqBlock?.type === 'faq' ? [faqLd(faqBlock.items)] : []),
 ];
 ---
 

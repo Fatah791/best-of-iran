@@ -1,0 +1,48 @@
+---
+import { Picture } from 'astro:assets';
+import { resolveImage } from '../assets/images';
+
+/**
+ * Responsive image: AVIF + WebP + JPEG srcsets, explicit dimensions (no CLS).
+ * Falls back to a plain <img> for paths not in the local registry (remote/SVG).
+ */
+interface Props {
+  src: string; // data path like /images/foo.jpg
+  alt: string;
+  widths?: number[];
+  sizes?: string;
+  class?: string;
+  eager?: boolean;
+}
+
+const {
+  src,
+  alt,
+  widths = [400, 800, 1200],
+  sizes = '100vw',
+  class: className,
+  eager = false,
+} = Astro.props;
+
+const optimized = resolveImage(src);
+---
+
+{
+  optimized ? (
+    <Picture
+      class={className}
+      fallbackFormat="jpeg"
+      formats={['avif', 'webp', 'jpeg']}
+      height={optimized.height}
+      loading={eager ? 'eager' : 'lazy'}
+      src={optimized}
+      widths={widths}
+      alt={alt}
+      decoding={eager ? 'sync' : 'async'}
+      fetchpriority={eager ? 'high' : undefined}
+      sizes={sizes}
+    />
+  ) : (
+    <img alt={alt} class={className} decoding="async" loading={eager ? 'eager' : 'lazy'} src={src} />
+  )
+}

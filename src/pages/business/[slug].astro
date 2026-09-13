@@ -2,8 +2,11 @@
 import PageLayout from '../../layouts/PageLayout.astro';
 import Icon from '../../components/Icon.astro';
 import JsonLd from '../../components/JsonLd.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import ResponsiveImage from '../../components/ResponsiveImage.astro';
 import { businesses, byCategory, fa, faRating } from '../../data/businesses';
 import { cities, categories, site } from '../../data/site';
+import { breadcrumbLd, localBusinessLd } from '../../lib/schema';
 
 export function getStaticPaths() {
   return businesses.map((b) => ({
@@ -18,28 +21,16 @@ const category = categories.find((c) => c.slug === business.category);
 const similar = byCategory(business.category).filter((b) => b.slug !== business.slug).slice(0, 3);
 const stars = [1, 2, 3, 4, 5];
 const mapUrl = `https://map.norimaps.com/?q=${encodeURIComponent(business.address)}`;
+const pageUrl = new URL(Astro.url.pathname, Astro.site).href;
 
-const ld = {
-  '@context': 'https://schema.org',
-  '@type': 'LocalBusiness',
-  name: business.name,
-  description: business.description,
-  image: business.image ? new URL(business.image, Astro.site).href : undefined,
-  address: {
-    '@type': 'PostalAddress',
-    streetAddress: business.address,
-    addressLocality: city?.label,
-    addressCountry: 'IR',
-  },
-  telephone: business.phone,
-  aggregateRating: {
-    '@type': 'AggregateRating',
-    ratingValue: business.rating,
-    reviewCount: business.reviews,
-    bestRating: 5,
-  },
-  url: new URL(Astro.url.pathname, Astro.site).href,
-};
+const ld = [
+  localBusinessLd(business, pageUrl),
+  breadcrumbLd([
+    ...(city ? [{ label: city.label, href: `/cities/${city.slug}` }] : []),
+    ...(category ? [{ label: category.label, href: `/categories/${category.slug}` }] : []),
+    { label: business.name },
+  ]),
+];
 ---
 
 <PageLayout
@@ -47,8 +38,21 @@ const ld = {
   heading={business.name}
   subheading={business.tagline}
   title={business.name}
->
+  >
+  <!-- NOTE: og:image stays site default; business images are build-time
+       optimized (hashed URLs) and cannot be used as static OG URLs.
+       When a CDN host exists, pass image={absCdnUrl} here. -->
   <JsonLd data={ld} slot="head" />
+
+  <Breadcrumbs
+    slot="breadcrumbs"
+    crumbs={[
+      ...(city ? [{ label: city.label, href: `/cities/${city.slug}` }] : []),
+      ...(category ? [{ label: category.label, href: `/categories/${category.slug}` }] : []),
+      { label: business.name },
+    ]}
+  />
+
   <div slot="actions" class="flex flex-wrap items-center gap-3 mt-2">
     <span class="flex items-center gap-1 text-primary font-bold bg-primary/10 px-3 py-1.5 rounded-lg text-sm">
       <Icon class="text-lg" icon="starFilled" />
@@ -72,7 +76,13 @@ const ld = {
       <div class="rounded-2xl overflow-hidden border border-surface-variant bg-surface-variant">
         {
           business.image ? (
-            <img alt={business.name} class="w-full max-h-96 object-cover" src={business.image} />
+            <ResponsiveImage
+              alt={business.name}
+              class="w-full max-h-96 object-cover"
+              eager
+              src={business.image}
+              widths={[700, 1200]}
+            />
           ) : (
             <div aria-label={`تصویر ${business.name}`} class="skeleton w-full h-64 md:h-80" role="img"></div>
           )

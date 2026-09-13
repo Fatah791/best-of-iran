@@ -10,18 +10,20 @@ interface Props {
   description?: string;
   heading: string;
   subheading?: string;
+  image?: string;
 }
 
-const { title, description, heading, subheading } = Astro.props;
+const { title, description, heading, subheading, image } = Astro.props;
 ---
 
-<BaseLayout description={description} title={`${title} | ${site.nameFa}`}>
+<BaseLayout description={description} image={image} title={`${title} | ${site.nameFa}`}>
   <slot name="head" slot="head" />
 
   <TopNavBar />
 
   <main class="flex-grow w-full" id="main">
     <div class="max-w-screen-2xl mx-auto px-margin-mobile md:px-margin-desktop py-lg">
+      <slot name="breadcrumbs" />
       <header class="mb-lg">
         <h1 class="font-headline-xl text-headline-xl text-on-surface mb-2">{heading}</h1>
         {

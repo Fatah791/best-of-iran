@@ -1,0 +1,39 @@
+---
+import Icon from './Icon.astro';
+
+export interface Crumb {
+  label: string;
+  href?: string; // omit for current page
+}
+
+interface Props {
+  crumbs: Crumb[];
+  class?: string;
+}
+
+const { crumbs, class: className } = Astro.props;
+---
+
+<nav aria-label="Breadcrumb" class:list={['text-on-surface-variant text-xs font-medium mb-md', className]}>
+  <ol class="flex flex-wrap items-center gap-1">
+    <li>
+      <a class="hover:text-primary transition-colors" href="/">خانه</a>
+    </li>
+    {
+      crumbs.map((c, i) => (
+        <li class="flex items-center">
+          <Icon class="mx-1 text-xs" icon="chevron_left" />
+          {c.href ? (
+            <a class="hover:text-primary transition-colors" href={c.href}>
+              {c.label}
+            </a>
+          ) : (
+            <span aria-current="page" class="text-on-surface">
+              {c.label}
+            </span>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+</nav>

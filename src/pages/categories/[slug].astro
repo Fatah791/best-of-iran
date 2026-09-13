@@ -2,7 +2,11 @@
 import PageLayout from '../../layouts/PageLayout.astro';
 import PlaceCard from '../../components/PlaceCard.astro';
 import Icon from '../../components/Icon.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import JsonLd from '../../components/JsonLd.astro';
 import { directoryCategories, cities } from '../../data/site';
+import { categorySeo } from '../../data/seo';
+import { breadcrumbLd, itemListLd } from '../../lib/schema';
 import { byCategory, fa } from '../../data/businesses';
 
 export function getStaticPaths() {
@@ -19,20 +23,42 @@ const selectedCity = cities.find((c) => c.slug === cityParam);
 let list = byCategory(category.slug);
 if (selectedCity) list = list.filter((b) => b.city === selectedCity.slug);
 
-const citiesWithData = cities.filter((c) =>
-  list.some((b) => b.city === c.slug),
-);
-const title = selectedCity
+const intro = categorySeo[category.slug]?.intro;
+const heading = selectedCity
   ? `بهترین ${category.label} ${selectedCity.label}`
-  : `بهترین ${category.label}`;
+  : `بهترین ${category.label} در ایران`;
+
+const ld = [
+  breadcrumbLd([
+    { label: 'دسته‌بندی‌ها', href: '/categories' },
+    ...(selectedCity ? [{ label: selectedCity.label, href: `/cities/${selectedCity.slug}` }] : []),
+    { label: category.label, href: selectedCity ? undefined : `/categories/${category.slug}` },
+  ]),
+  ...(list.length
+    ? [itemListLd(heading, list.map((b) => ({ name: b.name, url: `/business/${b.slug}` })))]
+    : []),
+];
 ---
 
 <PageLayout
-  description={`${title} — رتبه‌بندی بر اساس بازدید میدانی، کیفیت و رضایت مشتریان.`}
-  heading={selectedCity ? `${category.label} ${selectedCity.label}` : category.label}
-  subheading={`${fa(list.length)} کسب‌وکار در این دسته، رتبه‌بندی‌شده بر اساس امتیاز.`}
-  title={title}
+  description={`${heading} — رتبه‌بندی بر اساس بازدید میدانی، کیفیت و رضایت مشتریان.`}
+  heading={heading}
+  subheading={`${fa(list.length)} مورد، رتبه‌بندی‌شده بر اساس امتیاز.`}
+  title={selectedCity ? `${category.label} ${selectedCity.label}` : category.label}
 >
+  <JsonLd data={ld} slot="head" />
+
+  <Breadcrumbs
+    slot="breadcrumbs"
+    crumbs={[
+      { label: 'دسته‌بندی‌ها', href: '/categories' },
+      ...(selectedCity
+        ? [{ label: selectedCity.label, href: `/cities/${selectedCity.slug}` }]
+        : []),
+      { label: category.label },
+    ]}
+  />
+
   <div slot="actions">
     <nav class="flex flex-wrap gap-2 mt-2" aria-label="فیلتر شهر">
       <a
@@ -47,26 +73,28 @@ const title = selectedCity
         همه شهرها
       </a>
       {
-        cities.map((c) => {
-          const has = c.slug === selectedCity?.slug || citiesWithData.some((x) => x.slug === c.slug);
-          return (
-            <a
-              class:list={[
-                'px-4 py-2 rounded-full border font-label-md text-label-md transition-colors',
-                selectedCity?.slug === c.slug
-                  ? 'bg-primary text-on-primary border-primary'
-                  : 'border-outline-variant text-on-surface-variant hover:text-primary hover:border-primary',
-                !has && 'opacity-50',
-              ]}
-              href={`/categories/${category.slug}?city=${c.slug}`}
-            >
-              {c.label}
-            </a>
-          );
-        })
+        cities.map((c) => (
+          <a
+            class:list={[
+              'px-4 py-2 rounded-full border font-label-md text-label-md transition-colors',
+              selectedCity?.slug === c.slug
+                ? 'bg-primary text-on-primary border-primary'
+                : 'border-outline-variant text-on-surface-variant hover:text-primary hover:border-primary',
+            ]}
+            href={`/categories/${category.slug}?city=${c.slug}`}
+          >
+            {c.label}
+          </a>
+        ))
       }
     </nav>
   </div>
+
+  {intro && (
+    <div class="mb-lg max-w-3xl">
+      <p class="text-on-surface-variant leading-relaxed text-body-md">{intro}</p>
+    </div>
+  )}
 
   <div class="space-y-md">
     {
@@ -76,9 +104,7 @@ const title = selectedCity
         <div class="bg-surface-container rounded-2xl border border-dashed border-outline-variant p-lg text-center">
           <Icon class="text-4xl text-outline mx-auto mb-3" icon="search" />
           <p class="text-on-surface-variant mb-6">
-            در این ترکیب هنوز موردی ثبت نشده.
-            {selectedCity && ' شهر دیگری را امتحان کنید'}
-            .
+            در این ترکیب هنوز موردی ثبت نشده. شهر دیگری را امتحان کنید.
           </p>
           <a
             class="inline-flex items-center gap-2 bg-primary text-on-primary px-6 py-3 rounded-xl font-label-md hover:brightness-110 transition-all"

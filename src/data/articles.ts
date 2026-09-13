@@ -69,6 +69,7 @@ export interface FullArticle {
   h1: string;
   description: string;
   updated: string;
+  isoDate: string; // YYYY-MM-DD for JSON-LD
   author: string;
   readTime: string;
   breadcrumb: { label: string; href: string }[];
@@ -84,6 +85,7 @@ export const carwashIsfahan: FullArticle = {
   description:
     'بررسی میدانی و رتبه‌بندی بهترین کارواش‌های اصفهان بر اساس کیفیت شستشو، مواد نانو، قیمت و رضایت مشتریان.',
   updated: 'شهریور ۱۴۰۵',
+  isoDate: '2026-09-12',
   author: 'تیم تحریریه Best-of Iran',
   readTime: '۸ دقیقه',
   breadcrumb: [

@@ -289,7 +289,7 @@ const labelCls = 'block font-label-md text-label-md text-on-surface-variant mb-2
   const faDigits = (n: number) =>
     String(n).replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[Number(d)]);
 
-  function show(step: number) {
+  function show(step, opts = {}) {
     current = step;
     panels.forEach((p, i) => p.classList.toggle('hidden', i !== step));
     steps.forEach((s, i) => {
@@ -298,7 +298,11 @@ const labelCls = 'block font-label-md text-label-md text-on-surface-variant mb-2
       const marker = s.querySelector('.marker');
       if (marker) marker.textContent = i < step ? '✓' : faDigits(i + 1);
     });
-    root?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Never scroll on the initial render — a programmatic scroll right
+    // after load counts as a layout shift and tanks CLS/Lighthouse.
+    if (opts.scroll !== false) {
+      root?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
   function validatePanel(panel: HTMLElement): boolean {
@@ -396,5 +400,5 @@ const labelCls = 'block font-label-md text-label-md text-on-surface-variant mb-2
     }
   });
 
-  show(0);
+  show(0, { scroll: false });
 </script>

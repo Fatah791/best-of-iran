@@ -2,6 +2,10 @@
 import PageLayout from '../../layouts/PageLayout.astro';
 import PlaceCard from '../../components/PlaceCard.astro';
 import Icon from '../../components/Icon.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import JsonLd from '../../components/JsonLd.astro';
+import { citySeo } from '../../data/seo';
+import { breadcrumbLd, itemListLd, faqLd } from '../../lib/schema';
 import { cities, categories } from '../../data/site';
 import { byCity, fa } from '../../data/businesses';
 
@@ -11,23 +15,30 @@ export function getStaticPaths() {
 
 const { city } = Astro.props;
 const list = byCity(city.slug);
+const seo = citySeo[city.slug] ?? { intro: '', faq: [] };
 const catsWithItems = categories.filter((c) => list.some((b) => b.category === c.slug));
+
+const ld = [
+  breadcrumbLd([{ label: 'شهرها', href: '/cities' }, { label: city.label }]),
+  ...(list.length
+    ? [itemListLd(`بهترین کسب‌وکارهای ${city.label}`, list.map((b) => ({ name: b.name, url: `/business/${b.slug}` })))]
+    : []),
+  ...(seo.faq.length ? [faqLd(seo.faq)] : []),
+];
 ---
 
 <PageLayout
   description={`بهترین کسب‌وکارهای ${city.label} — بررسی میدانی و رتبه‌بندی بست آف ایران.`}
   heading={`بهترین‌های ${city.label}`}
-  subheading={`${fa(list.length)} کسب‌وکار برتر ${city.label} که تیم ما میدانی بررسی کرده است.`}
+  subheading={list.length ? `${fa(list.length)} کسب‌وکار برتر ${city.label} که تیم ما میدانی بررسی کرده است.` : 'فهرست کسب‌وکارهای این شهر در حال تکمیل است.'}
   title={`شهر ${city.label}`}
 >
+  <JsonLd data={ld} slot="head" />
+
+  <Breadcrumbs slot="breadcrumbs" crumbs={[{ label: 'شهرها', href: '/cities' }, { label: city.label }]} />
+
   <div slot="actions">
-    <nav class="flex flex-wrap gap-2 mt-2">
-      <a
-        class="px-4 py-2 rounded-full border font-label-md text-label-md transition-colors bg-primary text-on-primary border-primary"
-        href="#all"
-      >
-        همه
-      </a>
+    <nav class="flex flex-wrap gap-2 mt-2" aria-label="دسته‌بندی‌های این شهر">
       {
         catsWithItems.map((c) => (
           <a
@@ -35,12 +46,20 @@ const catsWithItems = categories.filter((c) => list.some((b) => b.category === c
             href={`/categories/${c.slug}?city=${city.slug}`}
           >
             {c.label}
-            <Icon class="text-xs mr-1" icon="arrow_back" />
+            <Icon class="text-xs mr-1 inline-block" icon="arrow_back" />
           </a>
         ))
       }
     </nav>
   </div>
+
+  {
+    seo.intro && (
+      <div class="mb-lg max-w-3xl">
+        <p class="text-on-surface-variant leading-relaxed text-body-md">{seo.intro}</p>
+      </div>
+    )
+  }
 
   <div class="space-y-md" id="all">
     {
@@ -67,4 +86,27 @@ const catsWithItems = categories.filter((c) => list.some((b) => b.category === c
       )
     }
   </div>
+
+  {
+    seo.faq.length > 0 && (
+      <section class="mt-xl max-w-3xl">
+        <h2 class="font-headline-md text-headline-md text-on-surface mb-md">
+          سوالات متداول درباره {city.label}
+        </h2>
+        <div class="space-y-sm">
+          {seo.faq.map((item) => (
+            <details class="group bg-surface border border-outline-variant rounded-lg [&_summary::-webkit-details-marker]:hidden">
+              <summary class="flex cursor-pointer items-center justify-between gap-1.5 p-4 text-on-surface font-medium">
+                {item.q}
+                <Icon class="shrink-0 transition duration-300 group-open:-rotate-180" icon="expand_more" />
+              </summary>
+              <div class="border-t border-outline-variant px-4 py-3 text-sm text-on-surface-variant">
+                {item.a}
+              </div>
+            </details>
+          ))}
+        </div>
+      </section>
+    )
+  }
 </PageLayout>

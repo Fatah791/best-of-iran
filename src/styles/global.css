@@ -177,6 +177,15 @@
   }
 }
 
+/* GPU-friendly offloading for below-the-fold sections:
+   browser skips rendering work until a section approaches the viewport.
+   contain-intrinsic-size keeps scrollbars stable while off-screen. */
+main > section,
+main > div > section {
+  content-visibility: auto
+  contain-intrinsic-size: auto 400px;
+}
+
 /* Scroll-reveal — elements opt in with [data-reveal].
    Hidden state is applied by JS only when motion is allowed, so no-JS
    and reduced-motion users always see full content. */

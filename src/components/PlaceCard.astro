@@ -1,5 +1,6 @@
 ---
 import Icon from './Icon.astro';
+import ResponsiveImage from './ResponsiveImage.astro';
 import { fa, faRating, type Business } from '../data/businesses';
 import { cities, categories } from '../data/site';
 
@@ -25,11 +26,12 @@ const category = categories.find((c) => c.slug === business.category);
     <div class="sm:col-span-2 relative bg-surface-variant min-h-40">
       {
         business.image ? (
-          <img
+          <ResponsiveImage
             alt={business.name}
             class="w-full h-full object-cover"
-            loading="lazy"
+            sizes="(min-width: 640px) 40vw, 92vw"
             src={business.image}
+            widths={[400, 700]}
           />
         ) : (
           <div class="skeleton absolute inset-0" role="img" aria-label={`تصویر ${business.name}`}></div>

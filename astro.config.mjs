@@ -4,6 +4,10 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   site: 'https://best-of-iran.vercel.app',
   trailingSlash: 'never',
+  build: {
+    // Inline small page-CSS (auto = only stylesheets used by ONE page)
+    inlineStylesheets: 'auto',
+  },
   vite: {
     plugins: [tailwindcss()],
   },
