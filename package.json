@@ -8,7 +8,9 @@
     "dev": "astro dev",
     "build": "astro build && node scripts/postbuild.mjs && node scripts/check-links.mjs",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "lh": "node scripts/lighthouse.mjs",
+    "lh:prod": "node scripts/lighthouse.mjs"
   },
   "keywords": [],
   "author": "",
