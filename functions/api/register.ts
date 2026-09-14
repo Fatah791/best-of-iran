@@ -69,22 +69,27 @@ export const onRequestPost: PagesFunction<{ WP_API_URL?: string }> = async (cont
   clean.submittedAt = new Date().toISOString();
 
   const wpBase = (context.env.WP_API_URL || 'http://143.20.60.33/wp-json').replace(/\/$/, '');
+  const wpUrl = `${wpBase}/boi/v1/lead`;
   try {
     const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 12000);
-    const res = await fetch(`${wpBase}/boi/v1/lead`, {
+    const timer = setTimeout(() => ctrl.abort(), 15000);
+    const payload = JSON.stringify({ ...clean, title: `${clean.name} — ${clean.phone}` });
+    const res = await fetch(wpUrl, {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ ...clean, title: `${clean.name} — ${clean.phone}` }),
+      headers: { 'content-type': 'application/json; charset=utf-8', 'user-agent': 'boi-pages-fn/1.0' },
+      body: payload,
       signal: ctrl.signal,
     });
     clearTimeout(timer);
-    const data = await res.json().catch(() => null);
-    if (!res.ok || !data?.ok) return json({ ok: false, error: 'wp_rejected' }, 502);
+    const rawBody = await res.text().catch(() => '');
+    const data = rawBody ? JSON.parse(rawBody) : null;
+    if (!res.ok || !data?.ok) {
+      return json({ ok: false, error: 'wp_rejected', wp_status: res.status, wp_body: rawBody.slice(0, 300), wp_url: wpUrl }, 502);
+    }
     return json({ ok: true, id: data.id });
   } catch (e) {
     // CMS down → form UX must not break; log for backfill via queue/retry later
     console.error('lead forward failed:', e instanceof Error ? e.message : e);
-    return json({ ok: true, queued: false, notice: 'received_with_delay' });
+    return json({ ok: true, queued: false, notice: 'received_with_delay', wp_url: wpUrl });
   }
 };
