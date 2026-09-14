@@ -19,7 +19,7 @@ import { site } from '../data/site';
 <BaseLayout title={`${site.name} - ${site.tagline}`}>
   <TopNavBar />
 
-  <main class="flex-grow flex flex-col pb-20 md:pb-0">
+  <main class="flex-grow flex flex-col pb-20 md:pb-0" id="main" tabindex="-1">
     <HeroSection>
       <HeroSearchForm slot="search" />
     </HeroSection>

@@ -21,7 +21,7 @@ const { title, description, heading, subheading, image } = Astro.props;
 
   <TopNavBar />
 
-  <main class="flex-grow w-full" id="main">
+  <main class="flex-grow w-full" id="main" tabindex="-1">
     <div class="max-w-screen-2xl mx-auto px-margin-mobile md:px-margin-desktop py-lg">
       <slot name="breadcrumbs" />
       <header class="mb-lg">

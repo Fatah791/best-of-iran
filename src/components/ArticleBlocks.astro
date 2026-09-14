@@ -55,7 +55,7 @@ const rankBadge = (n: number) => faNum(n);
             <div class="flex items-start gap-3">
               <Icon class="text-secondary mt-1" icon="check_circle" />
               <div>
-                <h4 class="font-bold text-on-surface">{item.title}</h4>
+                <h3 class="font-bold text-on-surface">{item.title}</h3>
                 <p class="text-sm text-on-surface-variant">{item.body}</p>
               </div>
             </div>
@@ -95,7 +95,7 @@ const rankBadge = (n: number) => faNum(n);
   <div class="bg-primary/10 border-r-4 border-primary p-md rounded-l-lg mb-lg mt-lg">
     <div class="flex items-center gap-2 mb-2">
       <Icon class="text-primary" icon="lightbulb" />
-      <h4 class="font-bold text-primary">{block.title}</h4>
+      <h3 class="font-bold text-primary">{block.title}</h3>
     </div>
     <p class="text-sm text-on-surface-variant leading-relaxed" set:html={block.bodyHtml}></p>
   </div>
@@ -111,7 +111,7 @@ const rankBadge = (n: number) => faNum(n);
       {
         block.items.map((item) => (
           <div class="bg-surface-variant/20 p-sm rounded-lg border border-outline-variant/30">
-            <h5 class="font-bold text-sm text-primary mb-1">{item.title}</h5>
+            <h4 class="font-bold text-sm text-primary mb-1">{item.title}</h4>
             <p class="text-xs text-on-surface-variant">{item.body}</p>
           </div>
         ))
@@ -141,7 +141,7 @@ const rankBadge = (n: number) => faNum(n);
                   eager={biz.rank === 1}
                   sizes="(min-width: 768px) 32vw, 92vw"
                   src={biz.image}
-                  widths={[500, 900, 1200]}
+                  widths={[480, 700, 900, 1200]}
                 />
                 {biz.editorPick && (
                   <div class="absolute top-sm right-sm bg-primary text-on-primary px-sm py-xs rounded-lg text-xs font-bold flex items-center gap-xs">
@@ -231,7 +231,7 @@ const rankBadge = (n: number) => faNum(n);
                   )
                 }
                 <a
-                  class="bg-[#25D366] text-white font-medium text-sm px-4 py-2 rounded-lg hover:brightness-110 flex items-center justify-center gap-2 transition-all flex-1"
+                  class="bg-[#25D366] text-[#08351f] font-medium text-sm px-4 py-2 rounded-lg hover:brightness-110 flex items-center justify-center gap-2 transition-all flex-1"
                   href={biz.whatsapp ? `https://wa.me/${biz.whatsapp}` : '#'}
                 >
                   <Icon icon="chat" />
