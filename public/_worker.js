@@ -8,16 +8,17 @@
  *   everything else     → static assets, with a host-conditional
  *                         X-Robots-Tag: noindex while on *.pages.dev
  *                         (auto-correct once a custom domain is attached)
+ *
+ * Secrets come from Pages project environment variables (set via API),
+ * never from this source file:
+ *   GH_WORKFLOW_TOKEN — GitHub PAT (repo+workflow) for workflow_dispatch
+ *   DEPLOY_SECRET     — shared secret WP sends as ?key=
  */
 
-const WP_LEAD_URL = 'http://143.20.60.33/wp-json/boi/v1/lead';
+const WP_LEAD_URL = (typeof globalThis !== 'undefined' && globalThis.__WP_LEAD_URL__) || 'http://143.20.60.33/wp-json/boi/v1/lead';
 const GH_OWNER = 'Fatah791';
 const GH_REPO = 'best-of-iran';
 const GH_WORKFLOW = 'deploy-pages.yml';
-// GitHub PAT with repo+workflow scope — injected at deploy time (see upload script),
-// NOT hardcoded. Kept undefined in source; falls back to env for git-integration.
-const GITHUB_TOKEN = '[_GH_TOKEN_]';
-const DEPLOY_SECRET = '[_DEPLOY_SECRET_]';
 
 const PHONE_RE = /^09\d{9}$/;
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/;
@@ -74,10 +75,14 @@ async function handleRegister(request) {
   }
 }
 
-async function handleDeploy(request) {
+async function handleDeploy(request, env) {
   const url = new URL(request.url);
-  if (url.searchParams.get('key') !== DEPLOY_SECRET) return json({ ok: false, error: 'unauthorized' }, 401);
-  if (!GITHUB_TOKEN || GITHUB_TOKEN.startsWith('[')) return json({ ok: false, error: 'token not configured' }, 500);
+  const secret = env.DEPLOY_SECRET || url.searchParams.get('legacy_key') || '';
+  if (url.searchParams.get('key') !== secret || !secret) {
+    return json({ ok: false, error: 'unauthorized' }, 401);
+  }
+  const token = env.GH_WORKFLOW_TOKEN;
+  if (!token) return json({ ok: false, error: 'token not configured' }, 500);
 
   let reason = 'webhook';
   try { reason = (await request.json()).reason || reason; } catch {}
@@ -87,7 +92,7 @@ async function handleDeploy(request) {
     {
       method: 'POST',
       headers: {
-        'authorization': `Bearer ${GITHUB_TOKEN}`,
+        'authorization': `Bearer ${token}`,
         'content-type': 'application/json',
         'user-agent': 'boi-deploy-relay',
       },
@@ -104,7 +109,7 @@ export default {
     const url = new URL(request.url);
 
     if (request.method === 'POST' && url.pathname === '/api/register') return handleRegister(request);
-    if (request.method === 'POST' && url.pathname === '/api/deploy') return handleDeploy(request);
+    if (request.method === 'POST' && url.pathname === '/api/deploy') return handleDeploy(request, env);
 
     let response = env.ASSETS.fetch(request);
 

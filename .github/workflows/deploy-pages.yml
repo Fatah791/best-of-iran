@@ -1,0 +1,35 @@
+name: deploy-pages
+# Manual (workflow_dispatch, relayed by CF Pages worker on WP publish) or on push to main.
+on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Why rebuilt'
+        default: 'manual'
+  push:
+    branches: [main]
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install + build (WP content source with seed fallback)
+        run: |
+          npm ci
+          npm run build
+        env:
+          WP_API_URL: ${{ secrets.WP_API_URL }}
+
+      - name: Deploy to Cloudflare Pages (direct upload)
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CF_PAGES_TOKEN }}
+          accountId: b688fd73f90f98b4a6b80bbf75a69945
+          command: pages deploy dist --project-name best-of-iran --branch main
