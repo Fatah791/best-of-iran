@@ -10,7 +10,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "lh": "node scripts/lighthouse.mjs",
-    "lh:prod": "node scripts/lighthouse.mjs"
+    "lh:prod": "node scripts/lighthouse.mjs",
+    "cf:deploy": "node scripts/cf-deploy.mjs"
   },
   "keywords": [],
   "author": "",
