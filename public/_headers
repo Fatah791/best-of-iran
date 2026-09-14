@@ -1,7 +1,6 @@
 /* mirror of vercel.json 1:1 — security headers + cache tiers.
    noindex on *.pages.dev preview so the staging URL is never indexed;
    remove the X-Robots-Tag line once the custom domain is live + want indexing. */
-/security-headers
 
 /*
   X-Content-Type-Options: nosniff
