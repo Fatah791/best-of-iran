@@ -111,13 +111,13 @@ export default {
     if (request.method === 'POST' && url.pathname === '/api/register') return handleRegister(request);
     if (request.method === 'POST' && url.pathname === '/api/deploy') return handleDeploy(request, env);
 
-    let response = env.ASSETS.fetch(request);
+    const response = await env.ASSETS.fetch(request);
 
-    // keep search engines out of the pages.dev preview; custom domains unaffected
+    // keep search engines out of the pages.dev preview; custom domains unaffected.
+    // Mutate headers in place — rebuilding with new Response(stream) can drop the
+    // body in the Pages asset runtime.
     if (url.hostname.endsWith('pages.dev') && request.method === 'GET') {
-      const headers = new Headers(response.headers);
-      if (!headers.has('x-robots-tag')) headers.set('x-robots-tag', 'noindex,nofollow');
-      response = new Response(response.body, { status: response.status, headers });
+      if (!response.headers.has('x-robots-tag')) response.headers.set('x-robots-tag', 'noindex,nofollow');
     }
     return response;
   },

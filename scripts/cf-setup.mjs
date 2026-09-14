@@ -1,79 +1,102 @@
 /**
- * One-time Cloudflare Pages project setup for best-of-iran:
- *   - production env secrets: GH_WORKFLOW_TOKEN, DEPLOY_SECRET
- *   - build config (no build — direct upload)
- * Reads secrets from C:/Users/tarahi/boi/deploy-secrets.json (creates it on
- * first run: GH PAT via git credential fill + random webhook secret).
+ * One-time CF Pages setup (no wrangler, no browser):
+ *  1. Pages production env: GH_WORKFLOW_TOKEN, DEPLOY_SECRET (deployment_configs PATCH — verified endpoint)
+ *  2. GitHub Actions repo secrets: CF_PAGES_TOKEN, WP_API_URL (libsodium crypto_box_seal emulation)
+ *  3. verify workflow_dispatch works with the token we give Pages
+ * Idempotent. Secrets file: C:/Users/tarahi/boi/deploy-secrets.json
  */
 import { execSync } from 'node:child_process';
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
-import { randomBytes } from 'node:crypto';
+import { randomBytes, createHash } from 'node:crypto';
+import { createRequire } from 'node:module';
 
-const A = 'b688fd73f90f98b4a6b80bbf75a69945';
-const T = process.env.CF_TOKEN || readFileSync('C:/Users/tarahi/boi/cf-token.txt', 'utf8').trim();
+const require = createRequire(import.meta.url);
+const sodium = require('C:/Users/tarahi/boi/_ssh2lib/node_modules/tweetnacl');
+
+const CF_A = 'b688fd73f90f98b4a6b80bbf75a69945';
+const CF_T = process.env.CF_TOKEN || readFileSync('C:/Users/tarahi/boi/cf-token.txt', 'utf8').trim();
 const PROJ = 'best-of-iran';
-const SECRETS_FILE = 'C:/Users/tarahi/boi/deploy-secrets.json';
+const SEC = 'C:/Users/tarahi/boi/deploy-secrets.json';
+const REPO = 'Fatah791/best-of-iran';
 
-if (!existsSync(SECRETS_FILE)) {
-  const gh = execSync('printf "protocol=https\\nhost=github.com\\n" | git credential fill', { shell: 'bash', encoding: 'utf8' });
-  const token = gh.match(/^password=(.*)$/m)[1];
-  writeFileSync(SECRETS_FILE, JSON.stringify({ GH_TOKEN: token, DEPLOY_SECRET: randomBytes(16).toString('hex') }), { mode: 0o600 });
-  console.log('created', SECRETS_FILE);
+const ghCred = () => {
+  const out = execSync('printf "protocol=https\\nhost=github.com\\n" | git credential fill', { shell: 'bash', encoding: 'utf8' });
+  return out.match(/^password=(.*)$/m)[1].trim();
+};
+
+async function gh(path, opts = {}) {
+  const res = await fetch('https://api.github.com' + path, {
+    ...opts,
+    headers: {
+      authorization: `Bearer ${ghCred()}`,
+      accept: 'application/vnd.github+json',
+      ...(opts.body ? { 'content-type': 'application/json' } : {}),
+      ...(opts.headers || {}),
+    },
+  });
+  if (res.status === 204) return { ok: true };
+  return { status: res.status, ...(await res.json().catch(() => ({}))) };
 }
-const { GH_TOKEN, DEPLOY_SECRET } = JSON.parse(readFileSync(SECRETS_FILE, 'utf8'));
 
-const api = async (path, opts = {}) => {
+async function cf(path, opts = {}) {
   const res = await fetch('https://api.cloudflare.com/client/v4' + path, {
     ...opts,
-    headers: { authorization: `Bearer ${T}`, ...(opts.headers || {}) },
+    headers: { authorization: `Bearer ${CF_T}`, 'content-type': 'application/json' },
   });
   const j = await res.json();
-  if (!j.success) { console.error(path, JSON.stringify(j.errors)); process.exit(1); }
+  if (!j.success) throw new Error(`CF ${path}: ${JSON.stringify(j.errors)}`);
   return j.result;
-};
-
-const enc = (v) => {
-  const data = new TextEncoder().encode(String(v));
-  const key = await crypto.subtle.importKey(
-    'raw',
-    Buffer.from('0253c20a7d24ef8f8b23291654625e62d5fec23b1b6330aa2c21f5b2ed7e7858', 'hex'), // check key below
-    { name: 'RSA-OAEP', hash: 'SHA-256' },
-    true,
-    ['encrypt'],
-  );
-  void data; void key;
-  throw new Error('placeholder'); // replaced below — see encryptSecret()
-};
-void enc;
-
-/* Public-key cert (base64 DER) fetched live, RSA-OAEP-SHA256 like wrangler does */
-async function encryptSecret(plaintext) {
-  const { result: pubKeyB64 } = await (
-    await fetch(`https://api.cloudflare.com/client/v4/accounts/${A}/pages/projects/${PROJ}/secrets`, {
-      method: 'POST',
-      headers: { authorization: `Bearer ${T}`, 'content-type': 'application/json' },
-      body: JSON.stringify({ name: '__get_pk_do_not_store', text: '' }),
-    })
-  ).json().catch(() => ({}));
-  void pubKeyB64;
-  // The two-step (fetch cert then encrypt) needs the dedicated endpoint; do it explicitly:
-  const certRes = await fetch(`https://api.cloudflare.com/client/v4/accounts/${A}/pages/secrets/cert`, {
-    headers: { authorization: `Bearer ${T}` },
-  });
-  const certJ = await certRes.json();
-  if (!certJ.success) { console.error('cert fetch failed', JSON.stringify(certJ.errors)); process.exit(1); }
-  const der = Uint8Array.from(atob(certJ.result), (c) => c.charCodeAt(0));
-  const key = await crypto.subtle.importKey('spki', der, { name: 'RSA-OAEP', hash: 'SHA-256' }, true, ['encrypt']);
-  const ct = await crypto.subtle.encrypt({ name: 'RSA-OAEP' }, key, new TextEncoder().encode(plaintext));
-  return btoa(String.fromCharCode(...new Uint8Array(ct)));
 }
 
-for (const [name, value] of [['GH_WORKFLOW_TOKEN', GH_TOKEN], ['DEPLOY_SECRET', DEPLOY_SECRET]]) {
-  const r = await api(`/accounts/${A}/pages/projects/${PROJ}/secrets`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ name, text: await encryptSecret(value) }),
-  });
-  console.log('secret set:', name, r?.status || 'ok');
+/* GitHub sealed box: ephemeral kp; nonce = sha256(eph_pub)[0..24]; sealed = eph_pub + crypto_box */
+const b64d = (s) => new Uint8Array(Buffer.from(s, 'base64'));
+const b64e = (u8) => Buffer.from(u8).toString('base64');
+function ghSeal(valueB64Key, plaintext) {
+  const recipient = b64d(valueB64Key);
+  const eph = sodium.box.keyPair();
+  const nonce = createHash('sha256').update(Buffer.from(eph.publicKey)).digest().subarray(0, 24);
+  const msg = new TextEncoder().encode(plaintext);
+  const cipher = sodium.box(msg, nonce, recipient, eph.secretKey);
+  const sealed = new Uint8Array(eph.publicKey.length + cipher.length);
+  sealed.set(eph.publicKey, 0);
+  sealed.set(cipher, eph.publicKey.length);
+  return b64e(sealed);
 }
-console.log('DEPLOY_SECRET=' + DEPLOY_SECRET); // print for WP wiring
+
+/* ---- 1) Pages env ---- */
+let sec = existsSync(SEC) ? JSON.parse(readFileSync(SEC, 'utf8')) : {};
+if (!sec.DEPLOY_SECRET) sec.DEPLOY_SECRET = randomBytes(16).toString('hex');
+// relay token: reuse the git-credential GitHub token for now (has repo access;
+// verified by step 3). A tighter fine-grained PAT can swap in later.
+sec.GH_RELAY_TOKEN = ghCred();
+writeFileSync(SEC, JSON.stringify(sec, null, 1));
+
+await cf(`/accounts/${CF_A}/pages/projects/${PROJ}`, {
+  method: 'PATCH',
+  body: JSON.stringify({ deployment_configs: { production: { env: {
+    GH_WORKFLOW_TOKEN: { type: 'plain_text', text: sec.GH_RELAY_TOKEN },
+    DEPLOY_SECRET: { type: 'plain_text', text: sec.DEPLOY_SECRET },
+  } } } }),
+});
+console.log('✓ Pages env: GH_WORKFLOW_TOKEN + DEPLOY_SECRET set');
+
+/* ---- 2) Actions secrets ---- */
+const pk = await gh(`/repos/${REPO}/actions/secrets/public-key`);
+if (!pk.key) throw new Error('public-key: ' + JSON.stringify(pk).slice(0, 160));
+for (const [name, value] of [['CF_PAGES_TOKEN', CF_T], ['WP_API_URL', 'http://143.20.60.33/wp-json']]) {
+  const r = await gh(`/repos/${REPO}/actions/secrets/${name}`, {
+    method: 'PUT',
+    body: JSON.stringify({ encrypted_value: ghSeal(pk.key, value), key_id: pk.key_id }),
+  });
+  if (r.ok || r.status === 201) console.log('✓ Actions secret:', name);
+  else throw new Error(`secret ${name}: ${JSON.stringify(r).slice(0, 200)}`);
+}
+
+/* ---- 3) verify dispatch works with the relay token ---- */
+const d = await gh(`/repos/${REPO}/actions/workflows/deploy-pages.yml/dispatches`, {
+  method: 'POST',
+  body: JSON.stringify({ ref: 'main' }),
+});
+console.log(d.ok ? '✓ workflow_dispatch OK (relay token works)' : '✗ dispatch: ' + JSON.stringify(d).slice(0, 200));
+
+console.log('\nDEPLOY_SECRET=' + sec.DEPLOY_SECRET);
