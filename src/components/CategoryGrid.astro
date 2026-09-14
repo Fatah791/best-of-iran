@@ -1,7 +1,9 @@
 ---
 import Icon from './Icon.astro';
 import SectionHeading from './SectionHeading.astro';
-import { categories } from '../data/site';
+import { allCategories } from '../lib/wp-adapter';
+
+const categories = (await allCategories()).slice(0, 7);
 ---
 
 <section class="py-16 bg-surface-container-low px-margin-mobile md:px-margin-desktop">

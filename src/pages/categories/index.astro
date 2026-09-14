@@ -1,8 +1,11 @@
 ---
 import PageLayout from '../../layouts/PageLayout.astro';
 import Icon from '../../components/Icon.astro';
-import { directoryCategories, cities } from '../../data/site';
-import { businesses, fa } from '../../data/businesses';
+import { allCities, allCategories } from '../../lib/wp-adapter';
+import { fa } from '../../data/businesses';
+import { allBusinesses } from '../../lib/wp-adapter';
+
+const [directoryCategories, cities, businesses] = [await allCategories(), await allCities(), await allBusinesses()];
 ---
 
 <PageLayout

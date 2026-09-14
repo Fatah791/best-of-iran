@@ -1,7 +1,9 @@
 ---
 import ArticleCard from './ArticleCard.astro';
 import Icon from './Icon.astro';
-import { latestArticles } from '../data/content';
+import { articleCards } from '../lib/wp-adapter';
+
+const latestArticles = await articleCards();
 ---
 
 <section class="py-16 px-margin-mobile md:px-margin-desktop max-w-screen-2xl mx-auto w-full">

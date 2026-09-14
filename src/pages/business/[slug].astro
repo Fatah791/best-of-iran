@@ -4,11 +4,13 @@ import Icon from '../../components/Icon.astro';
 import JsonLd from '../../components/JsonLd.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import ResponsiveImage from '../../components/ResponsiveImage.astro';
-import { businesses, byCategory, fa, faRating } from '../../data/businesses';
-import { cities, categories, site } from '../../data/site';
+import { allBusinesses, allCities, allCategories, byCategory } from '../../lib/wp-adapter';
+import { fa, faRating } from '../../data/businesses';
+import { site } from '../../data/site';
 import { breadcrumbLd, localBusinessLd } from '../../lib/schema';
 
-export function getStaticPaths() {
+export async function getStaticPaths() {
+  const businesses = await allBusinesses();
   return businesses.map((b) => ({
     params: { slug: b.slug },
     props: { business: b },
@@ -16,9 +18,10 @@ export function getStaticPaths() {
 }
 
 const { business } = Astro.props;
+const [cities, categories] = [await allCities(), await allCategories()];
 const city = cities.find((c) => c.slug === business.city);
 const category = categories.find((c) => c.slug === business.category);
-const similar = byCategory(business.category).filter((b) => b.slug !== business.slug).slice(0, 3);
+const similar = (await byCategory(business.category)).filter((b) => b.slug !== business.slug).slice(0, 3);
 const stars = [1, 2, 3, 4, 5];
 const mapUrl = `https://map.norimaps.com/?q=${encodeURIComponent(business.address)}`;
 const pageUrl = new URL(Astro.url.pathname, Astro.site).href;

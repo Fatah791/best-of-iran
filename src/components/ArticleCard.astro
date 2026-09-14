@@ -1,6 +1,6 @@
 ---
 import Icon from './Icon.astro';
-import { articlesBySlug } from '../data/articles';
+import { articleExists } from '../lib/wp-adapter';
 import type { Article } from '../data/content';
 
 interface Props {
@@ -8,8 +8,8 @@ interface Props {
 }
 
 const { article } = Astro.props;
-/** Cards link to the real page only when the article exists in the store. */
-const href = articlesBySlug[article.slug] ? `/articles/${article.slug}` : null;
+/** Cards link to the real page only when the article exists (CMS or seed). */
+const href = (await articleExists(article.slug)) ? `/articles/${article.slug}` : null;
 ---
 
 <article

@@ -4,23 +4,25 @@ import PlaceCard from '../../components/PlaceCard.astro';
 import Icon from '../../components/Icon.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import JsonLd from '../../components/JsonLd.astro';
-import { directoryCategories, cities } from '../../data/site';
 import { categorySeo } from '../../data/seo';
 import { breadcrumbLd, itemListLd } from '../../lib/schema';
-import { byCategory, fa } from '../../data/businesses';
+import { fa } from '../../data/businesses';
+import { allCities, allCategories, byCategory } from '../../lib/wp-adapter';
 
-export function getStaticPaths() {
-  return directoryCategories.map((category) => ({
+export async function getStaticPaths() {
+  const categories = await allCategories();
+  return categories.map((category) => ({
     params: { slug: category.slug },
     props: { category },
   }));
 }
 
 const { category } = Astro.props;
+const cities = await allCities();
 const cityParam = Astro.url.searchParams.get('city');
 const selectedCity = cities.find((c) => c.slug === cityParam);
 
-let list = byCategory(category.slug);
+let list = await byCategory(category.slug);
 if (selectedCity) list = list.filter((b) => b.city === selectedCity.slug);
 
 const intro = categorySeo[category.slug]?.intro;

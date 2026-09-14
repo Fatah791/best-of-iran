@@ -3,12 +3,14 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import ArticleLayout from '../../layouts/ArticleLayout.astro';
 import ArticleBlocks from '../../components/ArticleBlocks.astro';
 import JsonLd from '../../components/JsonLd.astro';
-import { getAllArticles, type FullArticle } from '../../data/articles';
+import { allArticles } from '../../lib/wp-adapter';
+import type { FullArticle } from '../../data/articles';
 import { site } from '../../data/site';
 import { breadcrumbLd, faqLd } from '../../lib/schema';
 
-export function getStaticPaths() {
-  return getAllArticles().map((article) => ({
+export async function getStaticPaths() {
+  const articles = await allArticles();
+  return articles.map((article) => ({
     params: { slug: article.slug },
     props: { article },
   }));

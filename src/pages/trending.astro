@@ -3,9 +3,10 @@ import PageLayout from '../layouts/PageLayout.astro';
 import PlaceCard from '../components/PlaceCard.astro';
 import Icon from '../components/Icon.astro';
 import { site } from '../data/site';
-import { topTrending, fa } from '../data/businesses';
+import { fa } from '../data/businesses';
+import { topTrending } from '../lib/wp-adapter';
 
-const list = topTrending(12);
+const list = await topTrending(12);
 ---
 
 <PageLayout

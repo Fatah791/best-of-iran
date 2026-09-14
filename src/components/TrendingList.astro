@@ -1,10 +1,10 @@
 ---
 import Icon from './Icon.astro';
 import { topTrending, fa, faRating, type Business } from '../data/businesses';
-import { categories, cities } from '../data/site';
+import { allCities, allCategories } from '../lib/wp-adapter';
 
 /** Homepage "trending this week" — real data from the directory. */
-const list: Business[] = topTrending(3);
+const [list, categories, cities] = [await topTrending(3), await allCategories(), await allCities()];
 const catOf = (b: Business) => categories.find((c) => c.slug === b.category);
 const cityOf = (b: Business) => cities.find((c) => c.slug === b.city);
 ---

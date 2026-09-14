@@ -2,9 +2,10 @@
 import PageLayout from '../layouts/PageLayout.astro';
 import PlaceCard from '../components/PlaceCard.astro';
 import Icon from '../components/Icon.astro';
-import { cities, categories } from '../data/site';
-import { businesses } from '../data/businesses';
 import { site } from '../data/site';
+import { allCities, allCategories, allBusinesses } from '../lib/wp-adapter';
+
+const [cities, categories, businesses] = [await allCities(), await allCategories(), await allBusinesses()];
 
 const q = Astro.url.searchParams.get('q') ?? '';
 const city = Astro.url.searchParams.get('city') ?? '';

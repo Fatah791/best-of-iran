@@ -6,15 +6,16 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import JsonLd from '../../components/JsonLd.astro';
 import { citySeo } from '../../data/seo';
 import { breadcrumbLd, itemListLd, faqLd } from '../../lib/schema';
-import { cities, categories } from '../../data/site';
-import { byCity, fa } from '../../data/businesses';
+import { allCities, allCategories, byCity } from '../../lib/wp-adapter';
+import { fa } from '../../data/businesses';
 
-export function getStaticPaths() {
+export async function getStaticPaths() {
+  const cities = await allCities();
   return cities.map((city) => ({ params: { slug: city.slug }, props: { city } }));
 }
 
 const { city } = Astro.props;
-const list = byCity(city.slug);
+const [list, categories] = [await byCity(city.slug), await allCategories()];
 const seo = citySeo[city.slug] ?? { intro: '', faq: [] };
 const catsWithItems = categories.filter((c) => list.some((b) => b.category === c.slug));
 

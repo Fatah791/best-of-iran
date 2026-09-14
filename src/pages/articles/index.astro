@@ -3,7 +3,9 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import TopNavBar from '../../components/TopNavBar.astro';
 import SiteFooter from '../../components/SiteFooter.astro';
 import ArticleCard from '../../components/ArticleCard.astro';
-import { latestArticles } from '../../data/content';
+import { articleCards } from '../../lib/wp-adapter';
+
+const latestArticles = await articleCards();
 ---
 
 <BaseLayout

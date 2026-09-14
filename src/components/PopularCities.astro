@@ -1,6 +1,7 @@
 ---
 import SectionHeading from './SectionHeading.astro';
-import { cities } from '../data/site';
+import { allCities } from '../lib/wp-adapter';
+const cities = await allCities();
 ---
 
 <section class="py-16 px-margin-mobile md:px-margin-desktop max-w-screen-2xl mx-auto w-full">

@@ -25,6 +25,11 @@ const {
 } = Astro.props;
 
 const optimized = resolveImage(src);
+
+/* CMS (WP) images arrive as absolute URLs and are not in the local
+   registry — serve them directly with lazy loading; WP does its own
+   resizing and the CDN caches them. */
+const remote = !optimized && /^https?:\/\//.test(src);
 ---
 
 {
@@ -41,6 +46,16 @@ const optimized = resolveImage(src);
       decoding={eager ? 'sync' : 'async'}
       fetchpriority={eager ? 'high' : undefined}
       sizes={sizes}
+    />
+  ) : remote ? (
+    <img
+      alt={alt}
+      class={className}
+      decoding="async"
+      fetchpriority={eager ? 'high' : undefined}
+      loading={eager ? 'eager' : 'lazy'}
+      sizes={sizes}
+      src={src}
     />
   ) : (
     <img alt={alt} class={className} decoding="async" loading={eager ? 'eager' : 'lazy'} src={src} />
