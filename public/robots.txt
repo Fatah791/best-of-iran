@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://best-of-iran.vercel.app/sitemap.xml
+# Staging/preview (best-of-iran.pages.dev) is noindex via X-Robots-Tag in _headers.
+# Sitemap URL is relative so it resolves to whatever domain is currently serving.
+Sitemap: /sitemap.xml
