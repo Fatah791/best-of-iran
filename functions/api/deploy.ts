@@ -49,7 +49,7 @@ export const onRequestPost: PagesFunction<{ GH_WORKFLOW_TOKEN?: string; DEPLOY_S
         'content-type': 'application/json',
         'user-agent': 'boi-deploy-relay',
       },
-      body: JSON.stringify({ ref: 'main', reason }),
+      body: JSON.stringify({ ref: 'main', inputs: { reason } }),
     },
   );
 
