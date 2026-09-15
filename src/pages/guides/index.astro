@@ -1,0 +1,55 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TopNavBar from '../../components/TopNavBar.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import Icon from '../../components/Icon.astro';
+import { allGuides } from '../../lib/wp-adapter';
+
+const guides = await allGuides();
+---
+
+<BaseLayout
+  description="راهنماها و مقالات آموزشی تیم بست آف ایران."
+  title="راهنماها | Best-of Iran"
+>
+  <TopNavBar />
+
+  <main class="flex-grow w-full px-margin-mobile md:px-margin-desktop py-xl" id="main" tabindex="-1">
+    <div class="max-w-screen-2xl mx-auto">
+      <h1 class="font-headline-xl text-headline-xl text-on-surface mb-2">
+        راهنماها و مقالات آموزشی
+      </h1>
+      <p class="font-body-lg text-body-lg text-on-surface-variant mb-lg">
+        دانش پشتِ رتبه‌بندی‌ها: معیارها، روش‌های بررسی و همه‌چیزی که باید بدانید.
+      </p>
+
+      {guides.length === 0 && (
+        <p class="text-on-surface-variant">هنوز راهنمایی منتشر نشده است.</p>
+      )}
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {guides.map((g) => (
+          <a
+            href={`/guides/${g.slug}`}
+            class="bg-surface-container rounded-2xl border border-surface-variant hover:border-primary/50 transition-colors p-6 flex flex-col gap-3"
+          >
+            <h2 class="font-headline-md text-lg text-on-surface">{g.title}</h2>
+            <p class="text-on-surface-variant text-sm line-clamp-3 flex-grow">{g.description}</p>
+            <div class="flex items-center gap-4 text-xs text-on-surface-variant">
+              <span class="flex items-center gap-1">
+                <Icon class="text-sm" icon="calendar_today" />
+                {g.updated}
+              </span>
+              <span class="flex items-center gap-1">
+                <Icon class="text-sm" icon="timer" />
+                {g.readTime}
+              </span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </main>
+
+  <SiteFooter />
+</BaseLayout>

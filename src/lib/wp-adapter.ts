@@ -27,6 +27,27 @@ import {
 import { cities as seedCities, directoryCategories as seedCategories } from '../data/site';
 import { citySeo as seedCitySeo, categorySeo as seedCategorySeo } from '../data/seo';
 
+/**
+ * Educational/long-form guides (WP plain `post`). Roundup/ranking pages
+ * (e.g. «بهترین کارواش‌های اصفهان») are the `boi_ranking` CPT in the admin
+ * and keep the structured FullArticle template — two content models, two
+ * templates, never mixed:
+ *   post        → /guides/<slug>    (prose layout, TOC from headings)
+ *   boi_ranking → /articles/<slug>  (block layout — visual identity unchanged)
+ */
+export interface Guide {
+  slug: string;
+  title: string;
+  description: string;
+  updated: string;
+  isoDate: string;
+  author: string;
+  readTime: string;
+  html: string; // WP-rendered body, ids injected on h2/h3
+  toc: { id: string; label: string; level: number }[];
+  image?: string;
+}
+
 /** Site-level shapes (same as data/site.ts). */
 export interface City { slug: string; label: string; }
 export interface Category { slug: string; label: string; icon: string; }
@@ -240,6 +261,49 @@ function toArticle(p: BizTerms, cities: WpTerm[], cats: WpTerm[]): FullArticle {
   };
 }
 
+/* ------------------------------------------------------------------ *
+ * Guide (educational post) parser: WP body → prose HTML + TOC
+ * ------------------------------------------------------------------ */
+
+/** slugify for heading ids keeps Persian letters (URL fragment-safe enough). */
+function headingId(text: string, i: number): string {
+  const base = stripHtml(text)
+    .replace(/[^\p{L}\p{N}\s-]/gu, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .slice(0, 48);
+  return (base || `h-${i + 1}`).toLowerCase();
+}
+
+function toGuide(p: WpPost): Guide | null {
+  const mv = (k: string) => metaVal(p, k);
+  const html = (p.content?.rendered ?? '').trim();
+  if (!html) return null;
+  const toc: Guide['toc'] = [];
+  let hi = 0;
+  const withIds = html.replace(/<h([23])([^>]*)>([\s\S]*?)<\/h\1>/g, (_all, lvl, attrs, inner) => {
+    const id = /id="/.test(attrs) ? attrs.match(/id="([^"]+)"/)![1] : headingId(String(inner), hi);
+    hi += 1;
+    toc.push({ id, label: stripHtml(String(inner)), level: Number(lvl) });
+    return `<h${lvl} id="${id}"${attrs}>${inner}</h${lvl}>`;
+  });
+  const media = p._embedded?.['https://api.w.org/featuredmedia']?.[0]?.source_url;
+  const words = html.replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).length;
+  const mins = Math.max(2, Math.round(words / 220));
+  return {
+    slug: fixSlug(p.slug),
+    title: stripHtml(p.title?.rendered) || p.slug,
+    description: String(mv('seo_description') ?? '') || stripHtml(p.excerpt?.rendered).trim(),
+    updated: faDate(p.modified || p.date),
+    isoDate: (String(mv('iso_date') ?? '') || (p.date || '')).slice(0, 10) || new Date().toISOString().slice(0, 10),
+    author: String(mv('author') ?? 'تیم تحریریه Best-of Iran'),
+    readTime: String(mv('read_time') ?? '') || `${'۰۱۲۳۴۵۶۷۸۹'[Math.floor(mins / 10)] ?? ''}${'۰۱۲۳۴۵۶۷۸۹'[mins % 10]} دقیقه`,
+    html: withIds,
+    toc,
+    image: media,
+  };
+}
+
 function blockAnchor(b: ArticleBlock): string {
   if (b.type === 'prose' || b.type === 'tip' || b.type === 'cards') return '';
   return {
@@ -260,6 +324,7 @@ interface Cms {
   source: 'wp' | 'seed';
   businesses: Business[];
   articles: FullArticle[];
+  guides: Guide[];
   cities: City[];
   categories: Category[];
   citySeo: typeof seedCitySeo;
@@ -289,15 +354,16 @@ let memo: Promise<Cms> | null = null;
 async function build(): Promise<Cms> {
   if (!wpEnabled()) return fallback('off');
 
-  const [bizPosts, postList, cityTerms, catTerms] = await Promise.all([
+  const [bizPosts, rankingPosts, postList, cityTerms, catTerms] = await Promise.all([
     wp<WpPost[]>('/wp/v2/business?per_page=100&_embed'),
-    wp<WpPost[]>('/wp/v2/posts?per_page=100&_embed'), // list meta only first
+    wp<WpPost[]>('/wp/v2/boi_ranking?per_page=100&_embed'), // roundup/ranking articles
+    wp<WpPost[]>('/wp/v2/posts?per_page=100&_embed'),       // educational guides
     loadTerms('boi_city'),
     loadTerms('boi_cat'),
   ]);
 
   // WP answered at least the posts route → treat as live source
-  const live = Boolean(bizPosts || postList || cityTerms || catTerms);
+  const live = Boolean(bizPosts || rankingPosts || postList || cityTerms || catTerms);
   if (!live) return fallback('unreachable');
 
   const cities = termsToCities(cityTerms ?? []);
@@ -308,8 +374,8 @@ async function build(): Promise<Cms> {
   // (plain Gutenberg paragraphs count — the block set is an enhancement,
   // not a gate). The default 'hello-world' (short + no categories) is junk.
   const articles: FullArticle[] = [];
-  for (const p of postList ?? []) {
-    const full = await wp<WpPost>(`/wp/v2/posts/${p.id}?_embed`);
+  for (const p of rankingPosts ?? []) {
+    const full = await wp<WpPost>(`/wp/v2/boi_ranking/${p.id}?_embed`);
     const a = toArticle(full ?? p, cityTerms ?? [], catTerms ?? []);
     const html = (full ?? p).content?.rendered ?? '';
     const isJunk =
@@ -318,16 +384,26 @@ async function build(): Promise<Cms> {
     if (!isJunk) articles.push(a);
   }
 
+  // Guides: plain WP posts (educational long-form). hello-world is junk.
+  const guides: Guide[] = [];
+  for (const p of postList ?? []) {
+    if (p.slug === 'hello-world') continue;
+    const full = await wp<WpPost>(`/wp/v2/posts/${p.id}?_embed`);
+    const g = toGuide(full ?? p);
+    if (g && g.html.length) guides.push(g);
+  }
+
   const businesses = (bizPosts ?? []).map((p) => toBusiness(p, cityTerms ?? [], catTerms ?? []));
 
   console.log(
     `[cms] WP source: ${businesses.length} businesses, ${articles.length} articles, ` +
-    `${cities.length} cities, ${cats.length} categories`,
+    `${guides.length} guides, ${cities.length} cities, ${cats.length} categories`,
   );
   return {
     source: 'wp',
     businesses: businesses.length ? businesses : seedBusinesses,
     articles: articles.length ? articles : seedAllArticles(),
+    guides,
     cities: cities.length ? cities : seedCities,
     categories: cats.length ? cats : seedCategories,
     citySeo: seedCitySeo,     // SEO copy stays in TS for now (editorial-controlled)
@@ -341,6 +417,7 @@ function fallback(reason: string): Cms {
     source: 'seed',
     businesses: seedBusinesses,
     articles: seedAllArticles(),
+    guides: [],
     cities: seedCities,
     categories: seedCategories,
     citySeo: seedCitySeo,
@@ -358,6 +435,7 @@ export function cms(): Promise<Cms> {
 
 export async function allBusinesses() { return (await cms()).businesses; }
 export async function allArticles() { return (await cms()).articles; }
+export async function allGuides() { return (await cms()).guides; }
 export async function allCities() { return (await cms()).cities; }
 export async function allCategories() { return (await cms()).categories; }
 
@@ -394,6 +472,10 @@ export async function topTrending(limit = 10): Promise<Business[]> {
 export async function articleExists(slug: string): Promise<boolean> {
   const { articles } = await cms();
   return articles.some((a) => a.slug === slug);
+}
+
+export async function guideBySlug(slug: string): Promise<Guide | undefined> {
+  return (await cms()).guides.find((g) => g.slug === slug);
 }
 
 /** Homepage 'latest articles' cards, derived from CMS articles + seed list. */
