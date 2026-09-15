@@ -7,7 +7,7 @@ import { readdirSync, statSync, writeFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const SITE = 'https://best-of-iran.pages.dev';
+const SITE = 'https://brtir.ir';
 const dist = fileURLToPath(new URL('../dist/', import.meta.url));
 
 function pages(dir, acc = []) {

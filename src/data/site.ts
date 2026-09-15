@@ -9,7 +9,7 @@ export const site = {
   description:
     'مرجع تخصصی معرفی بهترین کسب‌وکارهای ایران با بررسی‌های دقیق و واقعی.',
   tagline: 'بهترین کسب‌وکارهای ایران',
-  url: 'https://best-of-iran.pages.dev',
+  url: 'https://brtir.ir',
   year: '۱۴۰۴',
   telegramUrl: 'https://t.me/',
 };

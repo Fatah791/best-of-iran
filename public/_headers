@@ -1,13 +1,13 @@
 /* (mirrors vercel.json 1:1 — security headers + cache tiers)
-   noindex on *.pages.dev preview so the staging URL is never indexed;
-   remove this X-Robots-Tag line once the custom domain is live. */
+   NOTE: the old X-Robots-Tag noindex for the *.pages.dev preview is removed now
+   that the site is live on brtir.ir — every page ships a canonical link to
+   https://brtir.ir so search engines consolidate onto the real domain. */
 
 /*
   X-Content-Type-Options: nosniff
   X-Frame-Options: SAMEORIGIN
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(self)
-  X-Robots-Tag: noindex, nofollow
 
 /assets/*
   Cache-Control: public, max-age=31536000, immutable

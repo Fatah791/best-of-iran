@@ -2,7 +2,7 @@ import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  site: 'https://best-of-iran.pages.dev',
+  site: 'https://brtir.ir',
   trailingSlash: 'never',
   build: {
     // Inline small page-CSS (auto = only stylesheets used by ONE page)
