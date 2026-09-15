@@ -93,7 +93,7 @@ function toBusiness(p: BizTerms, cities: WpTerm[], cats: WpTerm[]): Business {
   const [rAuthor, rWhen, ...rText] = reviewRaw.split('|').map((s) => s.trim());
 
   return {
-    slug: p.slug,
+    slug: fixSlug(p.slug),
     name: stripHtml(p.title?.rendered) || p.slug,
     category: termOf(catIds(p), cats),
     city: termOf(cityIds(p), cities),
@@ -221,7 +221,7 @@ function toArticle(p: BizTerms, cities: WpTerm[], cats: WpTerm[]): FullArticle {
     .filter((t) => t.id);
 
   return {
-    slug: p.slug,
+    slug: fixSlug(p.slug),
     title: stripHtml(p.title?.rendered) || p.slug,
     h1: String(mv('seo_h1') ?? mv('_boi_seo_h1') ?? '') || stripHtml(p.title?.rendered) || p.slug,
     description: String(mv('seo_description') ?? '') || stripHtml(p.excerpt?.rendered),
@@ -271,6 +271,14 @@ type BizTerms = WpPost & { city?: number[]; category_boi?: number[] };
 
 function cityIds(p: BizTerms): number[] {
   return p.boi_city ?? p.city ?? [];
+}
+
+/** WP stores non-ASCII slugs percent-encoded; Astro can't build a route from
+ *  '%d9%be…'. Decode once at the adapter boundary so paths are clean unicode. */
+function fixSlug(slug: string): string {
+  if (!slug) return slug;
+  try { return /%[0-9a-f]{2}/i.test(slug) ? decodeURIComponent(slug) : slug; }
+  catch { return slug; }
 }
 function catIds(p: BizTerms): number[] {
   return (p as { boi_cat?: number[] }).boi_cat ?? p.category_boi ?? [];
