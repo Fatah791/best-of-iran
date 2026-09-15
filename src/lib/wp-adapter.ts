@@ -306,7 +306,7 @@ async function build(): Promise<Cms> {
     const html = (full ?? p).content?.rendered ?? '';
     const isJunk =
       p.slug === 'hello-world' ||
-      (a.blocks.length === 0 && !/<p>.{40,}/s.test(html));
+      (a.blocks.length === 0 && !/<p[^>]*>.{40,}/s.test(html));
     if (!isJunk) articles.push(a);
   }
 
