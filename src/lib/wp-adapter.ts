@@ -296,13 +296,18 @@ async function build(): Promise<Cms> {
   const cats = termsToCategories(catTerms ?? []);
 
   // full content per article (content only ships on single requests).
-  // Posts with zero boi blocks (e.g. the default 'hello-world') are junk
-  // for this site and never get rendered.
+  // Articles publish if they have structured boi blocks OR real prose
+  // (plain Gutenberg paragraphs count — the block set is an enhancement,
+  // not a gate). The default 'hello-world' (short + no categories) is junk.
   const articles: FullArticle[] = [];
   for (const p of postList ?? []) {
     const full = await wp<WpPost>(`/wp/v2/posts/${p.id}?_embed`);
     const a = toArticle(full ?? p, cityTerms ?? [], catTerms ?? []);
-    if (a.blocks.length) articles.push(a);
+    const html = (full ?? p).content?.rendered ?? '';
+    const isJunk =
+      p.slug === 'hello-world' ||
+      (a.blocks.length === 0 && !/<p>.{40,}/s.test(html));
+    if (!isJunk) articles.push(a);
   }
 
   const businesses = (bizPosts ?? []).map((p) => toBusiness(p, cityTerms ?? [], catTerms ?? []));
